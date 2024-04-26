@@ -4,6 +4,7 @@
 #include <math.h>
 #include "Variables.h"
 
+
 /****** New in v1.1. ******/
 /*** WDM parameters ***/
 #define P_CUTOFF (int) 0 // supress the power spectrum? 0= CDM; 1=WDM
