@@ -23,7 +23,7 @@ QSO_Redshift = 7.0842
 class Likelihood21cmFast_multiz(object):
     
     def __init__(self, k_values, PS_values, Error_k_values, PS_Error, Redshift, Redshifts_For_Prior, param_legend, Fiducial_Params, FlagOptions, param_string_names, NSplinePoints, 
-                        TsCalc_z, Foreground_cut, Shot_Noise_cut, IncludeLightCone, ModUncert, PriorLegend, NFValsQSO, PDFValsQSO):
+                        TsCalc_z, Foreground_cut, Shot_Noise_cut, IncludeLightCone, ModUncert, PriorLegend, NFValsQSO, PDFValsQSO, output_folder_location):
         self.k_values = k_values
         self.PS_values = PS_values
         self.Error_k_values = Error_k_values
@@ -43,6 +43,7 @@ class Likelihood21cmFast_multiz(object):
         self.PriorLegend = PriorLegend
         self.NFValsQSO = NFValsQSO
         self.PDFValsQSO = PDFValsQSO
+        self.output_folder_location = output_folder_location
 
     def Likelihood(self,ctx):
 
@@ -380,7 +381,7 @@ class Likelihood21cmFast_multiz(object):
 
                 for i in range(len(AllRedshifts)):                                
                     # Read in the neutral fraction and 21cm PS for this parameter set and redshift
-                    nf_value = np.loadtxt('NeutralFraction_%s_%s.txt'%(StringArgument_other,AllRedshifts[i]), usecols=(0,))
+                    nf_value = np.loadtxt(f'{self.output_folder_location}NeutralFraction_%s_%s.txt'%(StringArgument_other,AllRedshifts[i]), usecols=(0,))
 
                     nf_vals[i] = nf_value
 
@@ -391,8 +392,8 @@ class Likelihood21cmFast_multiz(object):
                         k_values_estimate = np.loadtxt('%s'%(LightconePS[i]), usecols=(0,)) 
                         PS_values_estimate = np.loadtxt('%s'%(LightconePS[i]), usecols=(1,))
                     else:
-                        k_values_estimate = np.loadtxt('delTps_estimate_%s_%s.txt'%(StringArgument_other,AllRedshifts[i]), usecols=(0,))
-                        PS_values_estimate = np.loadtxt('delTps_estimate_%s_%s.txt'%(StringArgument_other,AllRedshifts[i]), usecols=(1,))
+                        k_values_estimate = np.loadtxt(f'{self.output_folder_location}delTps_estimate_%s_%s.txt'%(StringArgument_other,AllRedshifts[i]), usecols=(0,))
+                        PS_values_estimate = np.loadtxt(f'{self.output_folder_location}delTps_estimate_%s_%s.txt'%(StringArgument_other,AllRedshifts[i]), usecols=(1,))
 
                     if self.FlagOptions['KEEP_ALL_DATA'] is True:
 
@@ -413,8 +414,8 @@ class Likelihood21cmFast_multiz(object):
                     PS_values_estimate = np.loadtxt('%s'%(LightconePS[i]), usecols=(1,))
                 else:
                     # Read in the neutral fraction and 21cm PS for this parameter set and redshift
-                    k_values_estimate = np.loadtxt('delTps_estimate_%s_%s.txt'%(StringArgument_other,self.Redshift[i]), usecols=(0,))
-                    PS_values_estimate = np.loadtxt('delTps_estimate_%s_%s.txt'%(StringArgument_other,self.Redshift[i]), usecols=(1,))
+                    k_values_estimate = np.loadtxt(f'{self.output_folder_location}delTps_estimate_%s_%s.txt'%(StringArgument_other,self.Redshift[i]), usecols=(0,))
+                    PS_values_estimate = np.loadtxt(f'{self.output_folder_location}delTps_estimate_%s_%s.txt'%(StringArgument_other,self.Redshift[i]), usecols=(1,))
 
 
                 splined_mock = interpolate.splrep(self.k_values[i],np.log10(self.PS_values[i]),s=0)
@@ -456,8 +457,8 @@ class Likelihood21cmFast_multiz(object):
 
         if (self.PriorLegend['PlanckPrior'] is True and number_redshifts > 2) or self.PriorLegend['McGreerPrior'] is True or self.PriorLegend['GreigPrior'] is True or self.FlagOptions['KEEP_ALL_DATA'] is True:
 
-            z_Hist = np.loadtxt('AveData_%s.txt'%(StringArgument_other), usecols=(0,))
-            xH_Hist = np.loadtxt('AveData_%s.txt'%(StringArgument_other), usecols=(1,))
+            z_Hist = np.loadtxt(f'{self.output_folder_location}AveData_%s.txt'%(StringArgument_other), usecols=(0,))
+            xH_Hist = np.loadtxt(f'{self.output_folder_location}AveData_%s.txt'%(StringArgument_other), usecols=(1,))
 
             # When the light-cone version is set, the values are writted in decreasing order, not increasing order
             # Therefore, reverse to be in increasing order (the interpolation/extrapolation is required to be in increasing order)
@@ -672,17 +673,17 @@ class Likelihood21cmFast_multiz(object):
                 os.system(command)
         else:
             
-            command = "rm delTps_estimate_%s_*"%(StringArgument_other)
+            command = f"rm {self.output_folder_location}delTps_estimate_%s_*"%(StringArgument_other)
             os.system(command)
 
-            command = "rm NeutralFraction_%s_*"%(StringArgument_other)
+            command = f"rm {self.output_folder_location}NeutralFraction_%s_*"%(StringArgument_other)
             os.system(command)
 
         if OutputGlobalAve == 1:
             if self.FlagOptions['KEEP_ALL_DATA'] is True:
-                command = "mv AveData_%s.txt %s/AveData/"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+                command = f"mv {self.output_folder_location}AveData_%s.txt %s/AveData/"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
             else:
-                command = "rm AveData_%s.txt"%(StringArgument_other)
+                command = f"rm {self.output_folder_location}AveData_%s.txt"%(StringArgument_other)
             
             os.system(command)
 
