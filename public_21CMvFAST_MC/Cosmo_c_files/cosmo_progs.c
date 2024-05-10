@@ -11,14 +11,6 @@ CAUTION:  many of these assume standard cosmology (k=0, etc.), so check them bef
 #include <ctype.h>
 #include <math.h>
 #include "../Parameter_files/COSMOLOGY.H"
-#include <gsl/gsl_interp.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-#include <gsl/gsl_roots.h>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_errno.h>
 
 double avoigt, cvoigt[31];
 int VOIGT_INIT;

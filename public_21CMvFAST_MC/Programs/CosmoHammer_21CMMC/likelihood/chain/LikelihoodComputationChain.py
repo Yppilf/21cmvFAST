@@ -21,8 +21,8 @@ class LikelihoodComputationChain(object):
         """
         self.min = min
         self.max = max
-        self._likelihoodModules = deque();
-        self._coreModules = deque();
+        self._likelihoodModules = deque()
+        self._coreModules = deque()
             
 
     def getCoreModules(self):

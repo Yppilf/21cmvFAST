@@ -104,7 +104,8 @@ class Likelihood21cmFast_multiz(object):
         # Add the second ID
         seq.append("%s"%(Individual_ID_2))
 
-        StringArgument_other = string.join(seq,separator_other)
+        # StringArgument_other = string.join(seq,separator_other)
+        StringArgument_other = f"{separator_other}".join(seq)
 
         # Add number of redshifts
         # If using the light-cone version of the code, don't need to set a redshift
@@ -122,7 +123,8 @@ class Likelihood21cmFast_multiz(object):
         # Add redshift for Ts.c calculation
         seq.append("%s"%(self.TsCalc_z))
 
-        StringArgument = string.join(seq,separator)
+        # StringArgument = string.join(seq,separator)
+        StringArgument = f"{separator}".join(seq)
 
         ##### Now we need to create the individual walker file to be read by drive_21cmMC_streamlined #####
         
@@ -443,7 +445,8 @@ class Likelihood21cmFast_multiz(object):
 
             if self.FlagOptions['KEEP_ALL_DATA'] is True:
 
-                StoredFileLayout = string.join(StoredFileLayout,separator_column)
+                # StoredFileLayout = string.join(StoredFileLayout,separator_column)
+                StoredFileLayout = f"{separator_column}".join(StoredFileLayout)
 
                 with open('%s/StatisticalData/TotalPSData_%s.txt'%(self.FlagOptions['KEEP_ALL_DATA_FILENAME'],StringArgument_other),'w') as f:            
                     for x in zip(*StoredStatisticalData):
@@ -505,7 +508,8 @@ class Likelihood21cmFast_multiz(object):
                 seq_Planck.append("%s"%(ZExtrapVals[i])) 
                 seq_Planck.append("%s"%(XHI_ExtrapVals[i]))    
 
-            StringArgument_Planck = string.join(seq_Planck,separator_Planck)
+            # StringArgument_Planck = string.join(seq_Planck,separator_Planck)
+            StringArgument_Plan = f"{separator_Planck}".join(seq_Planck)
 
             # Perform the computation of tau
             command = './ComputingTau_e %s %s %s'%(Individual_ID,Decimal(repr(params[0])).quantize(SIXPLACES),StringArgument_Planck)
@@ -703,4 +707,4 @@ class Likelihood21cmFast_multiz(object):
         return self.Likelihood(ctx)
 
     def setup(self):
-        print "Likelihood Fitting for 21cm Fast" 
+        print("Likelihood Fitting for 21cm Fast")

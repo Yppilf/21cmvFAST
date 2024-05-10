@@ -11,4 +11,4 @@ class RosenbrockModule(object):
         return -(self.a1 * (p[1]-p[0]**2)**2 + (1-p[0])**2)/self.a2
     
     def setup(self):
-        print "Rosenbrock setup"
+        print("Rosenbrock setup")

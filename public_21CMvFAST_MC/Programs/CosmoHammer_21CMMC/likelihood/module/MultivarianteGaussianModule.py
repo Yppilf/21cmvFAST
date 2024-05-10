@@ -17,7 +17,7 @@ class MultivarianteGaussianModule(object):
         return -np.dot(diff,np.dot(self.icov,diff))/2.0
 
     def setup(self):
-        print "Multivariante Gaussian setup"
+        print("Multivariante Gaussian setup")
             
         
     

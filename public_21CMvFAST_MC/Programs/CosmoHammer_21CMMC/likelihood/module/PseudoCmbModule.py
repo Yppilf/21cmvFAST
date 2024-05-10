@@ -37,7 +37,7 @@ class PseudoCmbModule(object):
         return True    
 
     def setup(self):
-        print "Pseudo cmb setup"
+        print("Pseudo cmb setup")
             
         
     

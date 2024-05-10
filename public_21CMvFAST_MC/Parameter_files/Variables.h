@@ -1,5 +1,4 @@
 // Globals for drive_21cmMC_streamlined.c
-#include <fftw3.h>
 
 /* Maximum allowed value for the kinetic temperature. Useful to set to avoid some spurious behaviour
  when the code is run with redshift poor resolution and very high X-ray heating efficiency */

@@ -1,9 +1,9 @@
-2018-02-23 14:51:54,595 INFO:Using CosmoHammer 0.2.1
-2018-02-23 14:51:54,595 INFO:Using emcee 1.2.0
-2018-02-23 14:51:54,600 INFO:Sampler: <class 'CosmoHammer_21CMMC.sampler.CosmoHammerSampler.CosmoHammerSampler'>
+2024-05-10 00:33:12,745 INFO:Using CosmoHammer 0.2.1
+2024-05-10 00:33:12,745 INFO:Using emcee 1.2.0
+2024-05-10 00:33:12,815 INFO:Sampler: <class 'CosmoHammer_21CMMC.sampler.CosmoHammerSampler.CosmoHammerSampler'>
 configuration: 
-  Burnin iterations: 0
-  Samples iterations: 5
+  Burnin iterations: 1
+  Samples iterations: 1
   Walkers ratio: 2
   Reusing burn in: False
   init pos generator: SampleBallPositionGenerator
@@ -15,6 +15,4 @@ Core Modules:
 Likelihood Modules: 
   Likelihood21cmFast_multiz
 
-2018-02-23 14:51:54,614 INFO:start sampling after burn in
-2018-02-23 14:52:33,091 INFO:sampling done! Took: 38.4771s
-2018-02-23 14:52:33,092 INFO:Mean acceptance fraction:0.4667
+2024-05-10 00:33:12,815 INFO:start burn in

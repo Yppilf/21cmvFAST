@@ -49,7 +49,7 @@ if __name__ == '__main__':
 	Include_Ts_fluc = False
 
 	# If the full spin temperature computation is to be performed, a redshift must be provided to which to perform the evolution down to.
-	TsCalc_z = 17.0
+	TsCalc_z = 16.1
 
 	# Decide whether to use light-cone boxes or co-eval boxes
 	# Note that the light-cone can only be generated along the z-direction (21cmFAST could do any arbitrary direction, this only does the z-direction). Should be 
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 	# Setting this to true will keep all relevant statistical data (i.e. tau, xH vs etc., PS vs k at all redshift etc.)
 	# Separating the accepted/rejected points from the MCMC output can be done in post-processing (a separate script is provided to do so "ReadAllData.py"). 
 	# It was a bit too unwieldly to do internally, so I opted for externally dealing with separating the data.
-	KEEP_ALL_DATA = False
+	KEEP_ALL_DATA = True
 
 
 
@@ -225,8 +225,8 @@ if __name__ == '__main__':
 	
 	# A check to see if additional redshifts have been added to the computation that are not necessary
 	if IncludePlanck is False and IncludeMcGreer is False and IncludeGreig is False and len(Redshifts_For_Prior) > 0:
-		print 'Additional redshifts have been added (in Redshifts_For_Prior) that are not necessary'
-		print 'Setting Redshifts_For_Prior to an empty list'
+		print('Additional redshifts have been added (in Redshifts_For_Prior) that are not necessary')
+		print('Setting Redshifts_For_Prior to an empty list')
 
 		Redshifts_For_Prior = []
 
@@ -876,8 +876,8 @@ if __name__ == '__main__':
                     LowerBound_XRAY=X_RAY_TVIR_LB,
                     UpperBound_XRAY=X_RAY_TVIR_UB,
                     SpinTz=TsCalc_z,
-                    burninIterations=0,
-                    sampleIterations=5,
+                    burninIterations=1,
+                    sampleIterations=1,
                     filethin = 1,
                     threadCount=1,
 	                reuseBurnin=False
@@ -909,9 +909,9 @@ if __name__ == '__main__':
 	if ErrorMessage is True:
 
 		for i in range(len(ErrorString)):
-			print ErrorString[i]
+			print(ErrorString[i])
 	
 	else:
-		print 'Start sampling'
+		print('Start sampling')
 		sampler.startSampling()            
 			
