@@ -37,12 +37,12 @@ if __name__ == '__main__':
 	# 1) Must manually provide the total number of redshifts used by 21CMMC.py (i.e. the sum total of Redshift and Redshifts_For_Prior if the co-eval option is set). 
 	#	 If the light-cone option is set, must provide the total number of redshifts (number of redshifts in the AveData_* textfile)
 
-	n_redshifts = 6
+	n_redshifts = 16.1
 
 	# 2) Must manually provide the number of sample iterations and the walkers ratio chosen in 21CMMC.py
 
 	walkers_ratio = 2
-	sample_iterations = 4
+	sample_iterations = 1
 
 	# 3) Provide the directory name for the stored data (21CMMC.py will create the directory with a timestamp)
 	KeepDataString = 'KEEP_MCMC_DATA_Fri_06_Oct_2017_09h_22m_38s'

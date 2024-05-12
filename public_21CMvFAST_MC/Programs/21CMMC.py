@@ -48,7 +48,7 @@ if __name__ == '__main__':
 	CosmologyToVary = []
 
 	# Performs the full evolution (Ts.c) of the IGM during reionisation and heating epoch. Setting to false reverts to saturated spin temperature limit (Ts >> Tcmb).
-	Include_Ts_fluc = False
+	Include_Ts_fluc = True
 
 	# If the full spin temperature computation is to be performed, a redshift must be provided to which to perform the evolution down to.
 	TsCalc_z = 16.1
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 	# Decide whether to use light-cone boxes or co-eval boxes
 	# Note that the light-cone can only be generated along the z-direction (21cmFAST could do any arbitrary direction, this only does the z-direction). Should be 
 	# trivial if one wants to add support for light-cones along any direction.
-	IncludeLightCone = False
+	IncludeLightCone = True
 
 	# Use an interpolation table for the full box collapsed fraction for the computation of the IGM spin temperature. 
 	UseFcollTable = False
