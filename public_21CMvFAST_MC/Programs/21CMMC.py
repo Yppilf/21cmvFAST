@@ -22,6 +22,7 @@ if __name__ == '__main__':
 	# Added the option to store the data in another folder than the relative path
 	# If the output is not moved, keep this as "./"
 	output_folder_location = "/scratch/s4950836/output_1/"
+	print("\n----------------------------\nStarting 21CMMC.py\n----------------------------\n")
 
 	# New version of 21CMMC allows for the full computation of the spin temperature fluctuations during the X-ray heating epoch. 21CMMC now includes a modified and 
 	# streamlined version of Ts.c from 21cmFAST. 

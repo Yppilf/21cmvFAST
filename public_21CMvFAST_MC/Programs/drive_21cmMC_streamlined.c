@@ -105,7 +105,7 @@ unsigned long long coeval_box_pos_FFT(int LOS_dir,int xi,int yi,int zi){
 }
 
 int main(int argc, char ** argv){
-
+     fprintf(stderr, "\n----------------------------\nStarting drive_21cmMC_streamlined.c\n----------------------------\n");
 
 
     // The standard build of 21cmFAST requires openmp for the FFTs. 21CMMC does not, however, for some computing architectures, I found it important to include this
@@ -117,9 +117,6 @@ int main(int argc, char ** argv){
 
     sprintf(dummy_string,"mkdir %s",OUTPUT_FOLDER);
     system(dummy_string);
-
-
-
 
     LC_BOX_PADDING = (int)ceil(LC_BOX_PADDING_IN_MPC/((float)BOX_LEN*(float)HII_DIM));
 
@@ -1128,6 +1125,7 @@ void ComputeTsBoxes() {
                   grid_sigmaTmin = Sigma_Tmin_grid[i];
 
                   if(USE_RELATIVE_VELOCITIES){
+                    fprintf(stderr, "using relative velocity interp 1");
                     grid_sigmaTmin = interpol_linear_2D(ZINT_MIN, ZINT_STEP, NZINT, VINT_MIN, VINT_STEP, NVINT,
                           	   sigmacool_vcb, zpp_grid, VCB_AVG*(1.0-ZERO_REL_VELOCITY))/dicke(zpp_grid);
                   }
@@ -1408,12 +1406,14 @@ void ComputeTsBoxes() {
                       //JBM:the velocity part, we add the ST as a function of velocity here.
                       factor_relative_velocities = 1.0;
                       if(zpp_curr>=ZLYMANWERNER && USE_RELATIVE_VELOCITIES){
+                        fprintf(stderr, "using relative velocity interp 2");
                          factor_relative_velocities = fmax(FCOLLMIN, exp( interpol_linear_2D(ZINT_MIN, ZINT_STEP, NZINT, VINT_MIN, VINT_STEP, NVINT,
                           	   logFcoll_vcb, zpp_curr, vcb_rev[box_ct][R_ct]) ));
 
                          double currentR = R_values[R_ct];
                          double currentgrowth = zpp_growth[R_ct];
                          double sigma_large = sigma_atR[R_ct]; //at z=0.
+                         fprintf(stderr, "using relative velocity interp 3");
                          double sigmacool_curr = interpol_linear_2D(ZINT_MIN, ZINT_STEP, NZINT, VINT_MIN, VINT_STEP, NVINT,
                                     sigmacool_vcb, zpp_curr, vcb_rev[box_ct][R_ct])/currentgrowth;
 

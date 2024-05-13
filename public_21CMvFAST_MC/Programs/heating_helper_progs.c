@@ -1712,8 +1712,12 @@ float Tc_eff_float(float TK, float TS)
 //JBM:we built a simple linear interpolator that is fast./////
 //////////////////////////////////////////////////////////////
 
-#define ZINT_MIN (double) 10.0
-#define ZINT_MAX (double) 50.0
+//// TS: Based on outputs of the jobscript the bounds have been adjusted to the specific simulation
+// #define ZINT_MIN (double) 10.0
+// #define ZINT_MAX (double) 50.0
+#define ZINT_MIN (double) 5.0
+#define ZINT_MAX (double) 10.0
+
 #define NZINT (int) 500
 #define ZINT_STEP (double) (ZINT_MAX-ZINT_MIN)/(NZINT-1.0)
 

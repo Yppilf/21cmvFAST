@@ -109,6 +109,9 @@ int main(int argc, char ** argv){
  //we need each of the components of v_i(k) to obtain v(x) (keeping correlations with \delta_m).
  //we will only need to smooth vcb, since that is the one we care about
 
+ //TS: Verbose to see which scripts are running
+ fprintf(stderr, "\n----------------------------\nStarting init.c\n----------------------------\n");
+
  //JBM:we also warn the user if kmin>0.01 Mpc-1, so that not all the vcb power is included
 
   if(BOX_LEN < 400 && USE_RELATIVE_VELOCITIES){

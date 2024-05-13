@@ -13,7 +13,7 @@
 float REDSHIFT;
 
 int main(int argc, char ** argv){
-
+    fprintf(stderr, "\n----------------------------\nStarting create_dens_boxes_for_LC.c\n----------------------------\n");
     omp_set_num_threads(1);
 
     char filename[500];

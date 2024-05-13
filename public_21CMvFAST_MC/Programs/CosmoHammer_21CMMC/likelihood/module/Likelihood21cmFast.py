@@ -373,7 +373,7 @@ class Likelihood21cmFast_multiz(object):
                 # For the light-cone version, the c-code creates a single textfile containing the filenames of each of the light-cone 21cm PS generated. This 
                 # should be of equal or greater length than the number of mock observations added.
 
-                LightconePSFilename = 'delTps_lightcone_filenames_%s.txt'%(StringArgument_other)
+                LightconePSFilename = f'{self.output_folder_location}delTps_lightcone_filenames_%s.txt'%(StringArgument_other)
                 filename = open('%s'%(LightconePSFilename), 'r') 
                 LightconePS = [line.rstrip('\n') for line in filename]
 
@@ -653,7 +653,7 @@ class Likelihood21cmFast_multiz(object):
 
             if self.FlagOptions['KEEP_GLOBAL_DATA'] is True:
 
-                LightconePSFilename = 'delTps_lightcone_filenames_%s.txt'%(StringArgument_other)
+                LightconePSFilename = f'{self.output_folder_location}delTps_lightcone_filenames_%s.txt'%(StringArgument_other)
                 filename = open('%s'%(LightconePSFilename), 'r') 
                 LightconePS = [line.rstrip('\n') for line in filename]
 
