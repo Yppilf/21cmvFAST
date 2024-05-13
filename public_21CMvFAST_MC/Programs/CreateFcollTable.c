@@ -66,7 +66,7 @@ int main(int argc, char ** argv){
     ///////////////////  Read in density box at z-prime  ///////////////
     
     // allocate memory for the nonlinear density field and open file
-    sprintf(filename, "../Boxes/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc",REDSHIFT, HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc",BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN);
     F = fopen(filename, "rb");
     for (i=0; i<HII_DIM; i++){
         for (j=0; j<HII_DIM; j++){

@@ -116,7 +116,7 @@ int main(int argc, char ** argv){
     // initialize power spectrum
     growth_factor = dicke(REDSHIFT);
     
-    sprintf(filename, "../Boxes/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN);
     F = fopen(filename, "rb");
     for (i=0; i<HII_DIM; i++){
         for (j=0; j<HII_DIM; j++){

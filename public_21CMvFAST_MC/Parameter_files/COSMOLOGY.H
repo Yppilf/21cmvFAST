@@ -51,6 +51,10 @@
 #define OUTPUT_FOLDER "/scratch/s4950836/output_1"
 //JBM:output folder name. If you want output in programs (as default) write "."
 
+// TS: Input folder name for boxes, incase files need to get moved.
+// If you want the default, write "../Boxes"
+#define BOXES_INPUT_FOLDER "/scratch/s4950836/Boxes"
+
 
 /* STRUCTURE */
 #define Deltac (1.68) /* at z=0, density excess at virialization */

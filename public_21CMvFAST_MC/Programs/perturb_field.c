@@ -18,12 +18,12 @@
 
   Output files:
 
-  "../Boxes/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN
+  "%s/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN
   -- This file contains the perturbed overdensity field, \delta, at <REDSHIFT>. The binary box has FFT padding
 
-  "../Boxes/updated_vx_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN
-  "../Boxes/updated_vy_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN
-  "../Boxes/updated_vz_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN
+  "%s/updated_vx_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN
+  "%s/updated_vy_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN
+  "%s/updated_vz_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN
   -- These files contain the velocity fields recalculated using the perturbed velocity fields at <REDSHIFT>.  The units are cMpc/s.  The boxes have FFT padding.
 */
 
@@ -93,11 +93,11 @@ int process_velocity(fftwf_complex *updated, float dDdt_over_D, float REDSHIFT, 
   fftwf_destroy_plan(plan);
   fftwf_cleanup();
   if (component == 0)
-    sprintf(filename, "../Boxes/updated_vx_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/updated_vx_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN);
   else if (component == 1)
-    sprintf(filename, "../Boxes/updated_vy_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/updated_vy_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN);
   else
-    sprintf(filename, "../Boxes/updated_vz_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/updated_vz_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN);
   if (!(F=fopen(filename, "wb"))){
     fprintf(stderr, "Unable to open file %s to write to.\n", filename);
     return -1;
@@ -196,7 +196,7 @@ int main (int argc, char ** argv){
     
   // check if the linear evolution flag was set
   if (EVOLVE_DENSITY_LINEARLY){
-    sprintf(filename, "../Boxes/smoothed_deltax_z0.00_%i_%.0fMpc", HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/smoothed_deltax_z0.00_%i_%.0fMpc", BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
     if (!(F=fopen(filename, "rb"))){
       fprintf(stderr, "perturb_field.c: Unable to open file %s for reading.\nAborting\n", filename);
       fftwf_free(updated); fftwf_free(vx);
@@ -235,7 +235,7 @@ int main (int argc, char ** argv){
       fftwf_free(vx); fftwf_free(vy); fftwf_free(updated);
       free_ps(); return -1;
     }
-    sprintf(filename, "../Boxes/vxoverddot_%i_%.0fMpc", HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/vxoverddot_%i_%.0fMpc", BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
     F=fopen(filename, "rb");
     if (mod_fread(vx, sizeof(float)*HII_TOT_NUM_PIXELS, 1, F)!=1){
       fprintf(stderr, "perturb_field: Read error occured while reading velocity box.\n");
@@ -243,7 +243,7 @@ int main (int argc, char ** argv){
       free_ps(); return -1;
     }
     fclose(F);
-    sprintf(filename, "../Boxes/vyoverddot_%i_%.0fMpc", HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/vyoverddot_%i_%.0fMpc", BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
     F=fopen(filename, "rb");
     if (mod_fread(vy, sizeof(float)*HII_TOT_NUM_PIXELS, 1, F)!=1){
       fprintf(stderr, "perturb_field: Read error occured while reading velocity box.\n");
@@ -251,7 +251,7 @@ int main (int argc, char ** argv){
       free_ps(); return -1;
     }
     fclose(F);
-    sprintf(filename, "../Boxes/vzoverddot_%i_%.0fMpc", HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/vzoverddot_%i_%.0fMpc", BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
     F=fopen(filename, "rb");
     if (mod_fread(vz, sizeof(float)*HII_TOT_NUM_PIXELS, 1, F)!=1){
       fprintf(stderr, "perturb_field: Read error occured while reading velocity box.\n");
@@ -274,7 +274,7 @@ int main (int argc, char ** argv){
       fftwf_free(vx);  fftwf_free(vy); fftwf_free(vz);fftwf_free(updated);
       free_ps(); return -1;
     }
-    sprintf(filename, "../Boxes/deltax_z0.00_%i_%.0fMpc", DIM, BOX_LEN);
+    sprintf(filename, "%s/deltax_z0.00_%i_%.0fMpc", BOXES_INPUT_FOLDER, DIM, BOX_LEN);
     F = fopen(filename, "rb");
     fprintf(stderr, "Reading in deltax box\n");
     if (mod_fread(deltax, sizeof(float)*TOT_FFT_NUM_PIXELS, 1, F)!=1){
@@ -324,7 +324,7 @@ int main (int argc, char ** argv){
 
     // read again velocities
 
-    sprintf(filename, "../Boxes/vxoverddot_2LPT_%i_%.0fMpc", HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/vxoverddot_2LPT_%i_%.0fMpc", BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
     F=fopen(filename, "rb");
     if (mod_fread(vx_2LPT, sizeof(float)*HII_TOT_NUM_PIXELS, 1, F)!=1){
       fprintf(stderr, "perturb_field: Read error occured while reading velocity 2LPT box.\n");
@@ -336,7 +336,7 @@ int main (int argc, char ** argv){
     //fprintf(stderr, "Read 2LPT vx velocity field\nElapsed time: %ds\n", time(NULL) - last_time);
     //last_time = time(NULL);
 
-    sprintf(filename, "../Boxes/vyoverddot_2LPT_%i_%.0fMpc", HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/vyoverddot_2LPT_%i_%.0fMpc", BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
     F=fopen(filename, "rb");
     if (mod_fread(vy_2LPT, sizeof(float)*HII_TOT_NUM_PIXELS, 1, F)!=1){
       fprintf(stderr, "perturb_field: Read error occured while reading velocity 2LPT box.\n");
@@ -348,7 +348,7 @@ int main (int argc, char ** argv){
     //fprintf(stderr, "Read 2LPT vy velocity field\nElapsed time: %ds\n", time(NULL) - last_time);
     //last_time = time(NULL);
 
-    sprintf(filename, "../Boxes/vzoverddot_2LPT_%i_%.0fMpc", HII_DIM, BOX_LEN);
+    sprintf(filename, "%s/vzoverddot_2LPT_%i_%.0fMpc", BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
     F=fopen(filename, "rb");
    if (mod_fread(vz_2LPT, sizeof(float)*HII_TOT_NUM_PIXELS, 1, F)!=1){
       fprintf(stderr, "perturb_field: Read error occured while reading velocity box.\n");
@@ -452,7 +452,7 @@ int main (int argc, char ** argv){
   fprintf(stderr, "Done with PT. Printing density field and computing velocity components.\n");
   fftwf_plan_with_nthreads(NUMCORES); // use all processors for perturb_field
   save_updated = (fftwf_complex *) vx;
-  sprintf(filename, "../Boxes/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", REDSHIFT, HII_DIM, BOX_LEN);
+  sprintf(filename, "%s/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN);
   F=fopen(filename, "wb");
   if (EVOLVE_DENSITY_LINEARLY){
     if (print_box_no_padding((float *)updated, HII_DIM, F) < 0){

@@ -91,7 +91,7 @@ int main(int argc, char ** argv){
         
     while (z_prime > REDSHIFT){
         
-        sprintf(filename, "../Boxes/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", z_prime, HII_DIM, BOX_LEN);
+        sprintf(filename, "%s/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, z_prime, HII_DIM, BOX_LEN);
 	printf("filename = %s\n",filename);
         F = fopen(filename, "rb");
         for (i=0; i<HII_DIM; i++){

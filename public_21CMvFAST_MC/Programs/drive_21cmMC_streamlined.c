@@ -823,11 +823,11 @@ void ComputeTsBoxes() {
         TK = T_RECFAST(REDSHIFT,0);
 
         // open input
-        sprintf(filename, "../Boxes/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc",REDSHIFT, HII_DIM, BOX_LEN);
+        sprintf(filename, "%s/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc",BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN);
         F = fopen(filename, "rb");
 
         // open output
-        sprintf(filename, "../Boxes/Ts_z%06.2f_zetaX%.1e_alphaX%.1f_TvirminX%.1e_zetaIon%.2f_Pop%i_%i_%.0fMpc", REDSHIFT, HII_EFF_FACTOR, X_RAY_SPEC_INDEX, X_RAY_Tvir_MIN, R_BUBBLE_MAX, Pop, HII_DIM, BOX_LEN);
+        sprintf(filename, "%s/Ts_z%06.2f_zetaX%.1e_alphaX%.1f_TvirminX%.1e_zetaIon%.2f_Pop%i_%i_%.0fMpc",BOXES_INPUT_FOLDER, REDSHIFT, HII_EFF_FACTOR, X_RAY_SPEC_INDEX, X_RAY_Tvir_MIN, R_BUBBLE_MAX, Pop, HII_DIM, BOX_LEN);
 
         // read file
         for (i=0; i<HII_DIM; i++){
@@ -884,7 +884,7 @@ void ComputeTsBoxes() {
             // Read in a pre-computed density field which is stored in the "Boxes" folder
 
             // allocate memory for the nonlinear density field and open file
-            sprintf(filename, "../Boxes/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc",REDSHIFT, HII_DIM, BOX_LEN);
+            sprintf(filename, "%s/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc",BOXES_INPUT_FOLDER, REDSHIFT, HII_DIM, BOX_LEN);
             F = fopen(filename, "rb");
             for (i=0; i<HII_DIM; i++){
                 for (j=0; j<HII_DIM; j++){
@@ -899,7 +899,7 @@ void ComputeTsBoxes() {
 
         //JBM:we also read the velocity field at z_dec, also in the /Boxes folder.
         if(USE_RELATIVE_VELOCITIES){
-        sprintf(filename, "../Boxes/smoothed_vcb_x_z0.00_%i_%.0fMpc", HII_DIM, BOX_LEN);
+        sprintf(filename, "%s/smoothed_vcb_x_z0.00_%i_%.0fMpc",BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
             F = fopen(filename, "rb");
             for (i=0; i<HII_DIM; i++){
                 for (j=0; j<HII_DIM; j++){
@@ -1804,7 +1804,7 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
     }
     else {
         // Read the desnity field of this redshift from file
-        sprintf(filename, "../Boxes/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc", REDSHIFT_SAMPLE, HII_DIM, BOX_LEN);
+        sprintf(filename, "%s/updated_smoothed_deltax_z%06.2f_%i_%.0fMpc",BOXES_INPUT_FOLDER, REDSHIFT_SAMPLE, HII_DIM, BOX_LEN);
         F = fopen(filename, "rb");
         for (i=0; i<HII_DIM; i++){
             for (j=0; j<HII_DIM; j++){
@@ -2400,11 +2400,11 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
     }
     else {
         switch(VELOCITY_COMPONENT){
-            case 1:  sprintf(filename, "../Boxes/updated_vx_z%06.2f_%i_%.0fMpc", REDSHIFT_SAMPLE, HII_DIM, BOX_LEN);
+            case 1:  sprintf(filename, "%s/updated_vx_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT_SAMPLE, HII_DIM, BOX_LEN);
                 break;
-            case 3:  sprintf(filename, "../Boxes/updated_vz_z%06.2f_%i_%.0fMpc", REDSHIFT_SAMPLE, HII_DIM, BOX_LEN);
+            case 3:  sprintf(filename, "%s/updated_vz_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT_SAMPLE, HII_DIM, BOX_LEN);
                 break;
-            default: sprintf(filename, "../Boxes/updated_vy_z%06.2f_%i_%.0fMpc", REDSHIFT_SAMPLE, HII_DIM, BOX_LEN);
+            default: sprintf(filename, "%s/updated_vy_z%06.2f_%i_%.0fMpc", BOXES_INPUT_FOLDER, REDSHIFT_SAMPLE, HII_DIM, BOX_LEN);
         }
         F=fopen(filename, "rb");
         for (i=0; i<HII_DIM; i++){
@@ -2828,7 +2828,7 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
         }
 
         fprintf(stderr, "Reading real-space vcb to get its power spectrum:\n");
-        sprintf(filename, "../Boxes/smoothed_vcb_x_z0.00_%i_%.0fMpc", HII_DIM, BOX_LEN);
+        sprintf(filename, "%s/smoothed_vcb_x_z0.00_%i_%.0fMpc", BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
         F = fopen(filename, "rb");
         if (!F){
           fprintf(stderr, "Couldn't open file %s for reading\nAborting...\n", filename);
@@ -3113,6 +3113,13 @@ void ComputeInitialConditions() {
 
      Author: Andrei Mesinger
      Date: 9/29/06
+     */
+
+     /*
+     Output is now written to the BOXES_INPUT_FOLDER defined in COSMOLOGY.H
+
+     Thomas Smeman
+     Date: 13/05/2024
      */
 
     fftwf_plan plan;
