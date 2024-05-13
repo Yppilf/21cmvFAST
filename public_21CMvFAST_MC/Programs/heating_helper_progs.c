@@ -1716,7 +1716,7 @@ float Tc_eff_float(float TK, float TS)
 // #define ZINT_MIN (double) 10.0
 // #define ZINT_MAX (double) 50.0
 #define ZINT_MIN (double) 5.0
-#define ZINT_MAX (double) 10.0
+#define ZINT_MAX (double) 50.0
 
 #define NZINT (int) 500
 #define ZINT_STEP (double) (ZINT_MAX-ZINT_MIN)/(NZINT-1.0)

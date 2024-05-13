@@ -55,6 +55,10 @@
 // If you want the default, write "../Boxes"
 #define BOXES_INPUT_FOLDER "/scratch/s4950836/Boxes"
 
+// TS: Where to store the Walker files, as they can take up quite a bit of space
+// For default, leave an empty string or "./"
+#define WALKER_FOLDER "/scratch/s4950836/Walker"
+
 
 /* STRUCTURE */
 #define Deltac (1.68) /* at z=0, density excess at virialization */

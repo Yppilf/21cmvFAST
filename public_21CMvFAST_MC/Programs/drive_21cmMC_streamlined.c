@@ -168,7 +168,7 @@ int main(int argc, char ** argv){
 
     /////////////////   Read in the cosmological parameter data     /////////////////
 
-    sprintf(filename,"WalkerCosmology_%1.6lf_%1.6lf.txt",INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+    sprintf(filename,"%sWalkerCosmology_%1.6lf_%1.6lf.txt",WALKER_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
     F = fopen(filename,"rt");
 
     for(i=0;i<TOTAL_COSMOLOGY_FILEPARAMS;i++) {
@@ -194,7 +194,7 @@ int main(int argc, char ** argv){
     // All available parameters to be varied in the MCMC are always listed, but are toggled on/off using 1/0
     // The MCMC sets the toggle, this C file reads the toggle and uses/sets the parameter values appropriately
 
-    sprintf(filename,"Walker_%1.6lf_%1.6lf.txt",INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+    sprintf(filename,"%sWalker_%1.6lf_%1.6lf.txt",WALKER_FOLDER, INDIVIDUAL_ID,INDIVIDUAL_ID_2);
     F = fopen(filename,"rt");
 
     if(!INHOMO_RECO||!USE_LIGHTCONE) {

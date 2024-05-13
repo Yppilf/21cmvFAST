@@ -48,7 +48,7 @@ int main(int argc, char ** argv){
     
     /////////////////   Read in the cosmological parameter data     /////////////////
     
-    sprintf(filename,"WalkerCosmology_%1.6lf_%1.6lf.txt",INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+    sprintf(filename,"%sWalkerCosmology_%1.6lf_%1.6lf.txt",WALKER_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
     F = fopen(filename,"rt");
     
     for(i=0;i<TOTAL_COSMOLOGY_FILEPARAMS;i++) {

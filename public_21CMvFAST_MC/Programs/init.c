@@ -167,6 +167,9 @@ int main(int argc, char ** argv){
   sprintf(command, "mkdir %s", BOXES_INPUT_FOLDER);
   system(command);
 
+  sprintf(command, "mkdir %s", WALKER_FOLDER);
+  system(command);
+
   // initialize and allocate thread info
   if (fftwf_init_threads()==0){
     fprintf(stderr, "init: ERROR: problem initializing fftwf threads\nAborting\n.");
