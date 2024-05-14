@@ -549,7 +549,7 @@ int main(int argc, char ** argv){
         init_MHR();
     }
 
-    fprintf(stderr, "\nAllocating additional boxes...\n");
+    fprintf(stderr, "\nAllocating additional boxes... %s\n", INHOMO_RECO);
 
     // ALLOCATE AND INITIALIZE ADDITIONAL BOXES NEEDED TO KEEP TRACK OF RECOMBINATIONS (Sobacchi & Mesinger 2014; NEW IN v1.3)
     if (INHOMO_RECO){ //  flag in ANAL_PARAMS.H to determine whether to compute recombinations or not
