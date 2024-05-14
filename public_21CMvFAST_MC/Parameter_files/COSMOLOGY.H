@@ -57,7 +57,7 @@
 
 // TS: Where to store the Walker files, as they can take up quite a bit of space
 // For default, leave an empty string or "./"
-#define WALKER_FOLDER "/scratch/s4950836/Walker"
+#define WALKER_FOLDER "/scratch/s4950836/Walker/"
 
 
 /* STRUCTURE */

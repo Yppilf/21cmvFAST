@@ -137,7 +137,7 @@ int main(int argc, char ** argv){
 
     double *PARAM_COSMOLOGY_VALS = calloc(TOTAL_COSMOLOGY_FILEPARAMS,sizeof(double));
 
-    sprintf(filename,"WalkerCosmology_%1.6lf_%1.6lf.txt",INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+    sprintf(filename,"%sWalkerCosmology_%1.6lf_%1.6lf.txt",WALKER_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
     F = fopen(filename,"rt");
 
     for(i=0;i<TOTAL_COSMOLOGY_FILEPARAMS;i++) {

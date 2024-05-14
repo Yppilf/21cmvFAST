@@ -195,6 +195,7 @@ int main(int argc, char ** argv){
     // The MCMC sets the toggle, this C file reads the toggle and uses/sets the parameter values appropriately
 
     sprintf(filename,"%sWalker_%1.6lf_%1.6lf.txt",WALKER_FOLDER, INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+    fprintf(stderr, "\n----------------------------\nReading parameter data from %s\n----------------------------\n", filename);
     F = fopen(filename,"rt");
 
     if(!INHOMO_RECO||!USE_LIGHTCONE) {
@@ -239,7 +240,9 @@ int main(int argc, char ** argv){
 
 
     // Initialise the power spectrum data, and relevant functions etc., for the entire file here (i.e. it is only done once here)
+    fprintf(stderr, "\n----------------------------\nStarting init_ps()\n----------------------------\n");
     init_ps();
+    fprintf(stderr, "\n----------------------------\nFinished init_ps()\n----------------------------\n");
 
     // If the USE_LIGHTCONE option is set, need to determing the size of the entire line-of-sight dimension for storing the slice indexes and corresponding reshifts per slice
     dR = (BOX_LEN / (double) HII_DIM) * CMperMPC; // size of cell (in comoving cm)
@@ -273,6 +276,7 @@ int main(int argc, char ** argv){
             end_index_LC = calloc(N_USER_REDSHIFT_LC,sizeof(int));
         }
     }
+    fprintf(stderr, "\n----------------------------\nFinished determining redshifts\n----------------------------\n");
 
     // Hard coded to 100,000. Should never excede this, unless very high resolution boxes are being used! (200^3, from z_min = 6 to z_max (z = 35) corresponds to 2232 indices).
     full_index_LC = calloc(100000,sizeof(int));
@@ -328,7 +332,7 @@ int main(int argc, char ** argv){
     }
 
 
-
+    fprintf(stderr, "\n----------------------------\nReading parameters\n----------------------------\n");
     ///////////////// Hard coded assignment of parameters, but can't do much about it (problem of merging C and Python code) //////////////////////////////////
     EFF_FACTOR_PL_INDEX = PARAM_VALS[0];
     HII_EFF_FACTOR = PARAM_VALS[1];
@@ -370,6 +374,7 @@ int main(int argc, char ** argv){
 
     Stored_LOS_direction_state_1 = LOS_direction;
 
+    fprintf(stderr, "\n----------------------------\nFinished reading parameters\n----------------------------\n");
 
     if(USE_LIGHTCONE||INHOMO_RECO) {
 
@@ -392,6 +397,7 @@ int main(int argc, char ** argv){
 
         if(USE_LIGHTCONE) {
 
+            fprintf(stderr, "\n----------------------------\nDetermining extra lightcone parameters\n----------------------------\n");
             // For determining parameters for the interpolation of the boxes for the construction of the light-cone
             // redshift_interpolate_boxes.c required redshifts in increasing order, the array redshifts is in decreasing order. Therefore just invert to leave as much code the same as possible
             z1_LC = redshifts[N_USER_REDSHIFT-1];
@@ -445,6 +451,8 @@ int main(int argc, char ** argv){
             box_z2 = (float *)calloc(HII_TOT_NUM_PIXELS,sizeof(float));
             box_interpolate = (float *)calloc(HII_TOT_NUM_PIXELS,sizeof(float));
             box_interpolate_remainder = (float *)calloc((float)HII_DIM*(float)HII_DIM*(float)remainder_LC,sizeof(float));
+
+            fprintf(stderr, "\n----------------------------\nFinished determining extra lightcone parameters\n----------------------------\n");
         }
     }
     Stored_LOS_direction_state_2 = LOS_direction;
@@ -480,6 +488,7 @@ int main(int argc, char ** argv){
         return 0;
     }
 
+    fprintf(stderr, "\nAllocating memory...\n");
     // Allocate memory for the IGM spin temperature and electron fraction which is stored globally to be taken from Ts.c and used with find_HII_bubbles.c
     Ts_z = (float *)calloc(HII_TOT_NUM_PIXELS,sizeof(float));
     x_e_z = (float *)calloc(HII_TOT_NUM_PIXELS,sizeof(float));
@@ -520,9 +529,9 @@ int main(int argc, char ** argv){
 
         aveTspin_inv = calloc(N_USER_REDSHIFT,sizeof(double));
         aveTkin_inv_sq = calloc(N_USER_REDSHIFT,sizeof(double));
+    }   
 
-    }
-
+    fprintf(stderr, "\nComputing initial conditions if necessary\n");
     // if GenerateNewICs == 1, generate the new initial conditions. This calculates the initial conditions in fourier space, and stores the relevant boxes in memory only (nothing is written to file)
     // At the same time, calculate the density field for calculating the IGM spin temperature.
     // This option must be set if the cosmology is to be varied.
@@ -539,6 +548,8 @@ int main(int argc, char ** argv){
     if (INHOMO_RECO) {
         init_MHR();
     }
+
+    fprintf(stderr, "\nAllocating additional boxes...\n");
 
     // ALLOCATE AND INITIALIZE ADDITIONAL BOXES NEEDED TO KEEP TRACK OF RECOMBINATIONS (Sobacchi & Mesinger 2014; NEW IN v1.3)
     if (INHOMO_RECO){ //  flag in ANAL_PARAMS.H to determine whether to compute recombinations or not
@@ -564,6 +575,7 @@ int main(int argc, char ** argv){
 
     /////////////////   Calculate the filtering scales for all the relevant smoothing scales for the HII_BUBBLES excursion set formalism    /////////////////
 
+    fprintf(stderr, "\nComputing spin temperature fluctuation boxes, %s\n", USE_TS_FLUCT);
     ///////////////////////////////// Decide whether or not the spin temperature fluctuations are to be computed (Ts.c) /////////////////////////////////
     if(USE_TS_FLUCT) {
         ///////////////////////////////// Perform 'Ts.c' /////////////////////////////////
@@ -607,11 +619,11 @@ int main(int argc, char ** argv){
         fclose(F);
     }
 
-
     // Output the text-file containing the file names of all the 21cm PS calculated from the light-cone boxes
     if(USE_LIGHTCONE) {
 
         sprintf(filename, "%s/delTps_lightcone_filenames_%f_%f.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+        fprintf(stderr, "Outputting spin temperature for lightcone to %s", filename);
         F=fopen(filename, "w");
         for(i=0;i<total_num_boxes;i++) {
             fprintf(F,"%s\n",lightcone_box_names[i]);
@@ -1125,7 +1137,6 @@ void ComputeTsBoxes() {
                   grid_sigmaTmin = Sigma_Tmin_grid[i];
 
                   if(USE_RELATIVE_VELOCITIES){
-                    fprintf(stderr, "using relative velocity interp 1");
                     grid_sigmaTmin = interpol_linear_2D(ZINT_MIN, ZINT_STEP, NZINT, VINT_MIN, VINT_STEP, NVINT,
                           	   sigmacool_vcb, zpp_grid, VCB_AVG*(1.0-ZERO_REL_VELOCITY))/dicke(zpp_grid);
                   }
@@ -1406,14 +1417,12 @@ void ComputeTsBoxes() {
                       //JBM:the velocity part, we add the ST as a function of velocity here.
                       factor_relative_velocities = 1.0;
                       if(zpp_curr>=ZLYMANWERNER && USE_RELATIVE_VELOCITIES){
-                        fprintf(stderr, "using relative velocity interp 2");
                          factor_relative_velocities = fmax(FCOLLMIN, exp( interpol_linear_2D(ZINT_MIN, ZINT_STEP, NZINT, VINT_MIN, VINT_STEP, NVINT,
                           	   logFcoll_vcb, zpp_curr, vcb_rev[box_ct][R_ct]) ));
 
                          double currentR = R_values[R_ct];
                          double currentgrowth = zpp_growth[R_ct];
                          double sigma_large = sigma_atR[R_ct]; //at z=0.
-                         fprintf(stderr, "using relative velocity interp 3");
                          double sigmacool_curr = interpol_linear_2D(ZINT_MIN, ZINT_STEP, NZINT, VINT_MIN, VINT_STEP, NVINT,
                                     sigmacool_vcb, zpp_curr, vcb_rev[box_ct][R_ct])/currentgrowth;
 

@@ -139,6 +139,7 @@ int main (int argc, char ** argv){
     double *PARAM_COSMOLOGY_VALS = calloc(TOTAL_COSMOLOGY_FILEPARAMS,sizeof(double));
     
     sprintf(filename,"%sWalkerCosmology_%1.6lf_%1.6lf.txt",WALKER_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+    fprintf(stderr, "Trying to open file: %s", filename);
     F = fopen(filename,"rt");
     
     for(i=0;i<TOTAL_COSMOLOGY_FILEPARAMS;i++) {
@@ -221,7 +222,7 @@ int main (int argc, char ** argv){
   // first order Zel'Dovich perturbation
   else{
 
-    fprintf(stderr, "Openning velocity files\n");
+    fprintf(stderr, "Opening velocity files\n");
     // allocate memory for the velocity boxes and read them in
     vy = (float *) fftwf_malloc(sizeof(float)*HII_TOT_NUM_PIXELS);
     if (!vy){

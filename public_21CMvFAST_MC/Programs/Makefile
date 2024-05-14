@@ -29,7 +29,8 @@ OBJ_FILES = perturb_field \
 	create_dens_boxes_for_LC \
 	Createfcoll_ionisation_LC \
 	smooth_output_box \
-	folder_smooth
+	folder_smooth \
+	init
 
 
 #########################################################################

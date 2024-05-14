@@ -5,6 +5,7 @@
 #SBATCH --mem-per-cpu=16G
 #SBATCH --job-name=21cmvFAST_lightcone_partial
 #SBATCH --time=12:00:00
+#SBATCH --output=/scratch/s4950836/%j.out
 
 module purge
 module load GCC
