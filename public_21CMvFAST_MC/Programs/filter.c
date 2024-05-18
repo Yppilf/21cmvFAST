@@ -91,6 +91,19 @@ void filter_smooth(fftwf_complex *box, int filter_type, float R){
 	k_mag = sqrt(k_x*k_x + k_y*k_y + k_z*k_z);
 
 	kR = k_mag*R; // real space top-hat
+
+	// Check whether box could go out of bounds
+	// unsigned long long idx = HII_C_INDEX(n_x, n_y, n_z);
+	// if (idx >= (sizeof(box) / sizeof(box[0]))){
+	// 	fprintf(stderr, "\nIndex %d will go out of bounds for nx,ny,nz = %d,%d,%d", idx,n_x,n_y,n_z);
+	// }else if(idx >= sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS) {
+	// 	fprintf(stderr, "\nIndex2 %d will go out of bounds for nx,ny,nz = %d,%d,%d", idx,n_x,n_y,n_z);
+	// }
+
+	// This is where it currently breaks
+	fftwf_complex *temp = box;
+	fprintf(stderr, "Temp: %f\n", (*temp));
+
 	if (filter_type == 0){ // real space top-hat
 	  if (kR > 1e-4){
 	    box[HII_C_INDEX(n_x, n_y, n_z)] *= 3.0 * (sin(kR)/pow(kR, 3) - cos(kR)/pow(kR, 2));

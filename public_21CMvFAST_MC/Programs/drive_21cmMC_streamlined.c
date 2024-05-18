@@ -116,7 +116,10 @@ int main(int argc, char ** argv){
     FILE *F;
 
     sprintf(dummy_string,"mkdir %s",OUTPUT_FOLDER);
-    system(dummy_string);
+    struct stat st = {0};
+    if (stat(OUTPUT_FOLDER, &st) == -1) {
+        system(dummy_string);
+    }
 
     LC_BOX_PADDING = (int)ceil(LC_BOX_PADDING_IN_MPC/((float)BOX_LEN*(float)HII_DIM));
 
@@ -169,6 +172,7 @@ int main(int argc, char ** argv){
     /////////////////   Read in the cosmological parameter data     /////////////////
 
     sprintf(filename,"%sWalkerCosmology_%1.6lf_%1.6lf.txt",WALKER_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+    fprintf(stderr, "Printing to %s", filename);
     F = fopen(filename,"rt");
 
     for(i=0;i<TOTAL_COSMOLOGY_FILEPARAMS;i++) {
@@ -195,6 +199,7 @@ int main(int argc, char ** argv){
     // The MCMC sets the toggle, this C file reads the toggle and uses/sets the parameter values appropriately
 
     sprintf(filename,"%sWalker_%1.6lf_%1.6lf.txt",WALKER_FOLDER, INDIVIDUAL_ID,INDIVIDUAL_ID_2);
+    fprintf(stderr, "Printing to %s", filename);
     fprintf(stderr, "\n----------------------------\nReading parameter data from %s\n----------------------------\n", filename);
     F = fopen(filename,"rt");
 
@@ -240,9 +245,7 @@ int main(int argc, char ** argv){
 
 
     // Initialise the power spectrum data, and relevant functions etc., for the entire file here (i.e. it is only done once here)
-    fprintf(stderr, "\n----------------------------\nStarting init_ps()\n----------------------------\n");
     init_ps();
-    fprintf(stderr, "\n----------------------------\nFinished init_ps()\n----------------------------\n");
 
     // If the USE_LIGHTCONE option is set, need to determing the size of the entire line-of-sight dimension for storing the slice indexes and corresponding reshifts per slice
     dR = (BOX_LEN / (double) HII_DIM) * CMperMPC; // size of cell (in comoving cm)
@@ -276,7 +279,6 @@ int main(int argc, char ** argv){
             end_index_LC = calloc(N_USER_REDSHIFT_LC,sizeof(int));
         }
     }
-    fprintf(stderr, "\n----------------------------\nFinished determining redshifts\n----------------------------\n");
 
     // Hard coded to 100,000. Should never excede this, unless very high resolution boxes are being used! (200^3, from z_min = 6 to z_max (z = 35) corresponds to 2232 indices).
     full_index_LC = calloc(100000,sizeof(int));
@@ -331,8 +333,6 @@ int main(int argc, char ** argv){
         return 0;
     }
 
-
-    fprintf(stderr, "\n----------------------------\nReading parameters\n----------------------------\n");
     ///////////////// Hard coded assignment of parameters, but can't do much about it (problem of merging C and Python code) //////////////////////////////////
     EFF_FACTOR_PL_INDEX = PARAM_VALS[0];
     HII_EFF_FACTOR = PARAM_VALS[1];
@@ -374,8 +374,6 @@ int main(int argc, char ** argv){
 
     Stored_LOS_direction_state_1 = LOS_direction;
 
-    fprintf(stderr, "\n----------------------------\nFinished reading parameters\n----------------------------\n");
-
     if(USE_LIGHTCONE||INHOMO_RECO) {
 
         counter = 0;
@@ -396,8 +394,6 @@ int main(int argc, char ** argv){
         }
 
         if(USE_LIGHTCONE) {
-
-            fprintf(stderr, "\n----------------------------\nDetermining extra lightcone parameters\n----------------------------\n");
             // For determining parameters for the interpolation of the boxes for the construction of the light-cone
             // redshift_interpolate_boxes.c required redshifts in increasing order, the array redshifts is in decreasing order. Therefore just invert to leave as much code the same as possible
             z1_LC = redshifts[N_USER_REDSHIFT-1];
@@ -452,7 +448,6 @@ int main(int argc, char ** argv){
             box_interpolate = (float *)calloc(HII_TOT_NUM_PIXELS,sizeof(float));
             box_interpolate_remainder = (float *)calloc((float)HII_DIM*(float)HII_DIM*(float)remainder_LC,sizeof(float));
 
-            fprintf(stderr, "\n----------------------------\nFinished determining extra lightcone parameters\n----------------------------\n");
         }
     }
     Stored_LOS_direction_state_2 = LOS_direction;
@@ -531,25 +526,31 @@ int main(int argc, char ** argv){
         aveTkin_inv_sq = calloc(N_USER_REDSHIFT,sizeof(double));
     }   
 
-    fprintf(stderr, "\nComputing initial conditions if necessary\n");
+    fprintf(stderr, "\nComputing initial conditions if necessary, %d\n", GenerateNewICs);
     // if GenerateNewICs == 1, generate the new initial conditions. This calculates the initial conditions in fourier space, and stores the relevant boxes in memory only (nothing is written to file)
     // At the same time, calculate the density field for calculating the IGM spin temperature.
     // This option must be set if the cosmology is to be varied.
     if(GenerateNewICs) {
+        fprintf(stderr, "\nFFTW_malloc\n");
         HIRES_density = (float *) fftwf_malloc(sizeof(float)*TOT_FFT_NUM_PIXELS);
 
+        fprintf(stderr, "\nComputing initial conditions\n");
         ComputeInitialConditions();
 
+        fprintf(stderr, "\nRedshift malloc\n");
         LOWRES_density_REDSHIFT = (float *) malloc(sizeof(float)*HII_TOT_NUM_PIXELS);
         LOWRES_velocity_REDSHIFT = (float *) malloc(sizeof(float)*HII_TOT_NUM_PIXELS);
 
     }
 
+    // #define INHOMO_RECO 0
+    fprintf(stderr, "\nInhomo_Reco: %d\n", INHOMO_RECO);
     if (INHOMO_RECO) {
+        
         init_MHR();
     }
 
-    fprintf(stderr, "\nAllocating additional boxes... %s\n", INHOMO_RECO);
+    fprintf(stderr, "\nAllocating additional boxes... %d\n", INHOMO_RECO);
 
     // ALLOCATE AND INITIALIZE ADDITIONAL BOXES NEEDED TO KEEP TRACK OF RECOMBINATIONS (Sobacchi & Mesinger 2014; NEW IN v1.3)
     if (INHOMO_RECO){ //  flag in ANAL_PARAMS.H to determine whether to compute recombinations or not
@@ -575,7 +576,7 @@ int main(int argc, char ** argv){
 
     /////////////////   Calculate the filtering scales for all the relevant smoothing scales for the HII_BUBBLES excursion set formalism    /////////////////
 
-    fprintf(stderr, "\nComputing spin temperature fluctuation boxes, %s\n", USE_TS_FLUCT);
+    fprintf(stderr, "\nComputing spin temperature fluctuation boxes, %d\n", USE_TS_FLUCT);
     ///////////////////////////////// Decide whether or not the spin temperature fluctuations are to be computed (Ts.c) /////////////////////////////////
     if(USE_TS_FLUCT) {
         ///////////////////////////////// Perform 'Ts.c' /////////////////////////////////
@@ -4543,7 +4544,13 @@ void init_21cmMC_Ts_arrays() {
 
     int i,j;
 
+    fprintf(stderr, "Allocating box with HII_KSPACE_NUM_PIXELS = %d\n", HII_KSPACE_NUM_PIXELS);
+    fprintf(stderr, "Allocating box with sizeof(fftwf_complex) = %d\n", sizeof(fftwf_complex));
+
     box = (fftwf_complex *) fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
+    if (box == NULL){
+        fprintf(stderr, "Box is not properly allocated");
+    }
     unfiltered_box = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
 
 //JBM:

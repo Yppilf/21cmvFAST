@@ -14,5 +14,7 @@ module load foss/2022b
 module load FFTW
 module load Python
 
+srun export LC_ALL=C
+
 srun ./drive_21cmMC_streamlined 1.000000 1.000000 1 1 0 6.0
 srun python ./21CMMC.py
