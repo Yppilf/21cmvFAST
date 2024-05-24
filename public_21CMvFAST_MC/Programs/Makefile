@@ -21,7 +21,8 @@ COSMO_FILES = 	${PARAMETER_DIR}/COSMOLOGY.H \
 
 # object files
 OBJ_FILES = perturb_field \
-	drive_21cmMC_streamlined\
+	drive_21cmMC_streamlined \
+	init_21cmMC_Ts_arrays \
 	SplitMockObservation \
 	CreateFcollTable\
 	CreateSmoothedDensityBoxes \
@@ -51,6 +52,11 @@ drive_21cmMC_streamlined: drive_21cmMC_streamlined.c \
 	${COSMO_FILES} \
 
 	${CC} ${CPPFLAGS} -o drive_21cmMC_streamlined drive_21cmMC_streamlined.c ${LDFLAGS}
+
+init_21cmMC_Ts_arrays: init_21cmMC_Ts_arrays.c \
+	${COSMO_FILES} \
+
+	${CC} ${CPPFLAGS} -o init_21cmMC_Ts_arrays init_21cmMC_Ts_arrays.c ${LDFLAGS}
 
 CreateFcollTable: CreateFcollTable.c \
 	${COSMO_FILES} \

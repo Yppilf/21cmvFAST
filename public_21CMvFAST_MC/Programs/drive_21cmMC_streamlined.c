@@ -7,6 +7,7 @@
 #include "filter.c"
 #include <sys/stat.h>
 
+#include "init_21cmMC_Ts_arrays.c"
 
 /*
 
@@ -4540,132 +4541,132 @@ void init_21cmMC_HII_arrays() {
     in_bin_ct = (unsigned long long *)calloc(NUM_BINS,sizeof(unsigned long long));
 }
 
-void init_21cmMC_Ts_arrays() {
+// void init_21cmMC_Ts_arrays() {
 
-    int i,j;
+//     int i,j;
 
-    fprintf(stderr, "Allocating box with HII_KSPACE_NUM_PIXELS = %d\n", HII_KSPACE_NUM_PIXELS);
-    fprintf(stderr, "Allocating box with sizeof(fftwf_complex) = %d\n", sizeof(fftwf_complex));
+//     fprintf(stderr, "Allocating box with HII_KSPACE_NUM_PIXELS = %d\n", HII_KSPACE_NUM_PIXELS);
+//     fprintf(stderr, "Allocating box with sizeof(fftwf_complex) = %d\n", sizeof(fftwf_complex));
 
-    box = (fftwf_complex *) fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
-    if (box == NULL){
-        fprintf(stderr, "Box is not properly allocated");
-    }
-    unfiltered_box = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
+//     box = (fftwf_complex *) fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
+//     if (box == NULL){
+//         fprintf(stderr, "Box is not properly allocated");
+//     }
+//     unfiltered_box = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
 
-//JBM:
-    box_vcb = (fftwf_complex *) fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
-    unfiltered_vcb_box = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
+//     //JBM:
+//     box_vcb = (fftwf_complex *) fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
+//     unfiltered_vcb_box = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex)*HII_KSPACE_NUM_PIXELS);
 
-    Tk_box = (float *) calloc(HII_TOT_NUM_PIXELS,sizeof(float));
-    x_e_box = (float *) calloc(HII_TOT_NUM_PIXELS,sizeof(float));
-    Ts = (float *) calloc(HII_TOT_NUM_PIXELS,sizeof(float));
+//     Tk_box = (float *) calloc(HII_TOT_NUM_PIXELS,sizeof(float));
+//     x_e_box = (float *) calloc(HII_TOT_NUM_PIXELS,sizeof(float));
+//     Ts = (float *) calloc(HII_TOT_NUM_PIXELS,sizeof(float));
 
-    inverse_diff = calloc(x_int_NXHII,sizeof(float));
+//     inverse_diff = calloc(x_int_NXHII,sizeof(float));
 
-    zpp_growth = (float *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     zpp_growth = (float *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
 
-    fcoll_R_grid = (double ***)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double **));
-    dfcoll_dz_grid = (double ***)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double **));
-    for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
-        fcoll_R_grid[i] = (double **)calloc(zpp_interp_points,sizeof(double *));
-        dfcoll_dz_grid[i] = (double **)calloc(zpp_interp_points,sizeof(double *));
-        for(j=0;j<zpp_interp_points;j++) {
-            fcoll_R_grid[i][j] = (double *)calloc(dens_Ninterp,sizeof(double));
-            dfcoll_dz_grid[i][j] = (double *)calloc(dens_Ninterp,sizeof(double));
-        }
-    }
+//     fcoll_R_grid = (double ***)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double **));
+//     dfcoll_dz_grid = (double ***)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double **));
+//     for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
+//         fcoll_R_grid[i] = (double **)calloc(zpp_interp_points,sizeof(double *));
+//         dfcoll_dz_grid[i] = (double **)calloc(zpp_interp_points,sizeof(double *));
+//         for(j=0;j<zpp_interp_points;j++) {
+//             fcoll_R_grid[i][j] = (double *)calloc(dens_Ninterp,sizeof(double));
+//             dfcoll_dz_grid[i][j] = (double *)calloc(dens_Ninterp,sizeof(double));
+//         }
+//     }
 
-    fcoll_R_array = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-    Sigma_Tmin_grid = (double *)calloc(zpp_interp_points,sizeof(double));
+//     fcoll_R_array = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     Sigma_Tmin_grid = (double *)calloc(zpp_interp_points,sizeof(double));
 
-    grid_dens = (double **)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double *));
-    for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
-        grid_dens[i] = (double *)calloc(dens_Ninterp,sizeof(double));
-    }
+//     grid_dens = (double **)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double *));
+//     for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
+//         grid_dens[i] = (double *)calloc(dens_Ninterp,sizeof(double));
+//     }
 
-    density_gridpoints = (double **)calloc(dens_Ninterp,sizeof(double *));
-    for(i=0;i<dens_Ninterp;i++) {
-        density_gridpoints[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-    }
-    ST_over_PS_arg_grid = (double *)calloc(zpp_interp_points,sizeof(double));
+//     density_gridpoints = (double **)calloc(dens_Ninterp,sizeof(double *));
+//     for(i=0;i<dens_Ninterp;i++) {
+//         density_gridpoints[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     }
+//     ST_over_PS_arg_grid = (double *)calloc(zpp_interp_points,sizeof(double));
 
-//JBM: we define the F_ST(v) 2D array.
-    logFcoll_vcb = (double **)calloc(NZINT,sizeof(double *));
-    for(i=0;i<NZINT;i++) {
-        logFcoll_vcb[i] = (double *)calloc(NVINT,sizeof(double));
-    }
+//     //JBM: we define the F_ST(v) 2D array.
+//     logFcoll_vcb = (double **)calloc(NZINT,sizeof(double *));
+//     for(i=0;i<NZINT;i++) {
+//         logFcoll_vcb[i] = (double *)calloc(NVINT,sizeof(double));
+//     }
 
-//JBM: and sigma(z,v,M_cool(z,v)).
-    sigmacool_vcb = (double **)calloc(NZINT,sizeof(double *));
-    for(i=0;i<NZINT;i++) {
-        sigmacool_vcb[i] = (double *)calloc(NVINT,sizeof(double));
-    }
-
-
+//     //JBM: and sigma(z,v,M_cool(z,v)).
+//     sigmacool_vcb = (double **)calloc(NZINT,sizeof(double *));
+//     for(i=0;i<NZINT;i++) {
+//         sigmacool_vcb[i] = (double *)calloc(NVINT,sizeof(double));
+//     }
 
 
-    dens_grid_int_vals = (short **)calloc(HII_TOT_NUM_PIXELS,sizeof(short *));
-    delNL0_rev = (float **)calloc(HII_TOT_NUM_PIXELS,sizeof(float *));
-    for(i=0;i<HII_TOT_NUM_PIXELS;i++) {
-        dens_grid_int_vals[i] = (short *)calloc((float)NUM_FILTER_STEPS_FOR_Ts,sizeof(short));
-        delNL0_rev[i] = (float *)calloc((float)NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    }
 
-//JBM:values of velocity smoothed over some scale R
-    vcb_rev = (float **)calloc(HII_TOT_NUM_PIXELS,sizeof(float *));
-    for(i=0;i<HII_TOT_NUM_PIXELS;i++) {
-        vcb_rev[i] = (float *)calloc((float)NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    }
 
-    fcoll_interp1 = (double **)calloc(dens_Ninterp,sizeof(double *));
-    fcoll_interp2 = (double **)calloc(dens_Ninterp,sizeof(double *));
-    dfcoll_interp1 = (double **)calloc(dens_Ninterp,sizeof(double *));
-    dfcoll_interp2 = (double **)calloc(dens_Ninterp,sizeof(double *));
-    for(i=0;i<dens_Ninterp;i++) {
-        fcoll_interp1[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-        fcoll_interp2[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-        dfcoll_interp1[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-        dfcoll_interp2[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-    }
+//     dens_grid_int_vals = (short **)calloc(HII_TOT_NUM_PIXELS,sizeof(short *));
+//     delNL0_rev = (float **)calloc(HII_TOT_NUM_PIXELS,sizeof(float *));
+//     for(i=0;i<HII_TOT_NUM_PIXELS;i++) {
+//         dens_grid_int_vals[i] = (short *)calloc((float)NUM_FILTER_STEPS_FOR_Ts,sizeof(short));
+//         delNL0_rev[i] = (float *)calloc((float)NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     }
 
-    zpp_edge = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-    sigma_atR = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-    sigma_Tmin = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-    ST_over_PS = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-    sum_lyn = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     //JBM:values of velocity smoothed over some scale R
+//     vcb_rev = (float **)calloc(HII_TOT_NUM_PIXELS,sizeof(float *));
+//     for(i=0;i<HII_TOT_NUM_PIXELS;i++) {
+//         vcb_rev[i] = (float *)calloc((float)NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     }
 
-    zpp_for_evolve_list = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    R_values = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    SingleVal_float = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     fcoll_interp1 = (double **)calloc(dens_Ninterp,sizeof(double *));
+//     fcoll_interp2 = (double **)calloc(dens_Ninterp,sizeof(double *));
+//     dfcoll_interp1 = (double **)calloc(dens_Ninterp,sizeof(double *));
+//     dfcoll_interp2 = (double **)calloc(dens_Ninterp,sizeof(double *));
+//     for(i=0;i<dens_Ninterp;i++) {
+//         fcoll_interp1[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//         fcoll_interp2[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//         dfcoll_interp1[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//         dfcoll_interp2[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     }
 
-    delNL0_bw = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    delNL0_Offset = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    delNL0_LL = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    delNL0_UL = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    delNL0_ibw = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    log10delNL0_diff = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
-    log10delNL0_diff_UL = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     zpp_edge = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     sigma_atR = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     sigma_Tmin = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     ST_over_PS = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     sum_lyn = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
 
-    freq_int_heat_tbl = (double **)calloc(x_int_NXHII,sizeof(double *));
-    freq_int_ion_tbl = (double **)calloc(x_int_NXHII,sizeof(double *));
-    freq_int_lya_tbl = (double **)calloc(x_int_NXHII,sizeof(double *));
-    freq_int_heat_tbl_diff = (double **)calloc(x_int_NXHII,sizeof(double *));
-    freq_int_ion_tbl_diff = (double **)calloc(x_int_NXHII,sizeof(double *));
-    freq_int_lya_tbl_diff = (double **)calloc(x_int_NXHII,sizeof(double *));
-    for(i=0;i<x_int_NXHII;i++) {
-        freq_int_heat_tbl[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-        freq_int_ion_tbl[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-        freq_int_lya_tbl[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-        freq_int_heat_tbl_diff[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-        freq_int_ion_tbl_diff[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-        freq_int_lya_tbl_diff[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
-    }
+//     zpp_for_evolve_list = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     R_values = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     SingleVal_float = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
 
-    dstarlya_dt_prefactor = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     delNL0_bw = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     delNL0_Offset = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     delNL0_LL = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     delNL0_UL = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     delNL0_ibw = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     log10delNL0_diff = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
+//     log10delNL0_diff_UL = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(float));
 
-    SingleVal_int = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(short));
-}
+//     freq_int_heat_tbl = (double **)calloc(x_int_NXHII,sizeof(double *));
+//     freq_int_ion_tbl = (double **)calloc(x_int_NXHII,sizeof(double *));
+//     freq_int_lya_tbl = (double **)calloc(x_int_NXHII,sizeof(double *));
+//     freq_int_heat_tbl_diff = (double **)calloc(x_int_NXHII,sizeof(double *));
+//     freq_int_ion_tbl_diff = (double **)calloc(x_int_NXHII,sizeof(double *));
+//     freq_int_lya_tbl_diff = (double **)calloc(x_int_NXHII,sizeof(double *));
+//     for(i=0;i<x_int_NXHII;i++) {
+//         freq_int_heat_tbl[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//         freq_int_ion_tbl[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//         freq_int_lya_tbl[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//         freq_int_heat_tbl_diff[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//         freq_int_ion_tbl_diff[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//         freq_int_lya_tbl_diff[i] = (double *)calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+//     }
+
+//     dstarlya_dt_prefactor = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(double));
+
+//     SingleVal_int = calloc(NUM_FILTER_STEPS_FOR_Ts,sizeof(short));
+// }
 
 void destroy_21cmMC_HII_arrays(int skip_deallocate) {
 
@@ -4746,12 +4747,12 @@ void destroy_21cmMC_Ts_arrays() {
     }
     free(density_gridpoints);
 
-//JBM we free the collapse array
+    //JBM we free the collapse array
     for(i=0;i<NZINT;i++) {
         free(logFcoll_vcb[i]);
     }
     free(logFcoll_vcb);
-//JBM we free the collapse array
+    //JBM we free the collapse array
     for(i=0;i<NZINT;i++) {
         free(sigmacool_vcb[i]);
     }
@@ -4782,11 +4783,11 @@ void destroy_21cmMC_Ts_arrays() {
     free(dens_grid_int_vals);
     free(delNL0_rev);
 
-//JBM:
-for(i=0;i<HII_TOT_NUM_PIXELS;i++) {
-    free(vcb_rev[i]);
-}
-free(vcb_rev);
+    //JBM:
+    for(i=0;i<HII_TOT_NUM_PIXELS;i++) {
+        free(vcb_rev[i]);
+    }
+    free(vcb_rev);
 
 
     free(delNL0_bw);
