@@ -22,6 +22,7 @@ if __name__ == '__main__':
 	# Added the option to store the data in another folder than the relative path
 	# If the output is not moved, keep this as "./"
 	output_folder_location = "/scratch/s4950836/output_1/"
+	walker_folder_location = "/scratch/s4950836/Walker/"
 	print("\n----------------------------\nStarting 21CMMC.py\n----------------------------\n")
 
 	# New version of 21CMMC allows for the full computation of the spin temperature fluctuations during the X-ray heating epoch. 21CMMC now includes a modified and 
@@ -861,7 +862,7 @@ if __name__ == '__main__':
 	
 	Likelihoodmodel21cmFast = Likelihood21cmFast_multiz(multi_z_mockobs_k,multi_z_mockobs_PS,multi_z_Error_k,multi_z_Error_PS,
 			Redshift,Redshifts_For_Prior,param_legend,Fiducial_Params,FlagOptions,param_string_names,NSplinePoints,TsCalc_z,foreground_cut,shot_noise_cut,IncludeLightCone,
-			ModUncert,PriorLegend,NFVals_QSODamping,PDFVals_QSODamping, output_folder_location)	
+			ModUncert,PriorLegend,NFVals_QSODamping,PDFVals_QSODamping, output_folder_location, walker_folder_location)	
 
 	chain.addLikelihoodModule(Likelihoodmodel21cmFast)
 

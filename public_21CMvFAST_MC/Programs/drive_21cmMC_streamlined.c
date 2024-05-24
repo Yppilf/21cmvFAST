@@ -172,7 +172,7 @@ int main(int argc, char ** argv){
     /////////////////   Read in the cosmological parameter data     /////////////////
 
     sprintf(filename,"%sWalkerCosmology_%1.6lf_%1.6lf.txt",WALKER_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
-    fprintf(stderr, "Printing to %s", filename);
+    fprintf(stderr, "Printing to %s\n", filename);
     F = fopen(filename,"rt");
 
     for(i=0;i<TOTAL_COSMOLOGY_FILEPARAMS;i++) {
@@ -199,7 +199,7 @@ int main(int argc, char ** argv){
     // The MCMC sets the toggle, this C file reads the toggle and uses/sets the parameter values appropriately
 
     sprintf(filename,"%sWalker_%1.6lf_%1.6lf.txt",WALKER_FOLDER, INDIVIDUAL_ID,INDIVIDUAL_ID_2);
-    fprintf(stderr, "Printing to %s", filename);
+    fprintf(stderr, "Printing to %s\n", filename);
     fprintf(stderr, "\n----------------------------\nReading parameter data from %s\n----------------------------\n", filename);
     F = fopen(filename,"rt");
 
@@ -526,25 +526,17 @@ int main(int argc, char ** argv){
         aveTkin_inv_sq = calloc(N_USER_REDSHIFT,sizeof(double));
     }   
 
-    fprintf(stderr, "\nComputing initial conditions if necessary, %d\n", GenerateNewICs);
     // if GenerateNewICs == 1, generate the new initial conditions. This calculates the initial conditions in fourier space, and stores the relevant boxes in memory only (nothing is written to file)
     // At the same time, calculate the density field for calculating the IGM spin temperature.
     // This option must be set if the cosmology is to be varied.
     if(GenerateNewICs) {
-        fprintf(stderr, "\nFFTW_malloc\n");
         HIRES_density = (float *) fftwf_malloc(sizeof(float)*TOT_FFT_NUM_PIXELS);
-
-        fprintf(stderr, "\nComputing initial conditions\n");
         ComputeInitialConditions();
-
-        fprintf(stderr, "\nRedshift malloc\n");
         LOWRES_density_REDSHIFT = (float *) malloc(sizeof(float)*HII_TOT_NUM_PIXELS);
         LOWRES_velocity_REDSHIFT = (float *) malloc(sizeof(float)*HII_TOT_NUM_PIXELS);
-
     }
 
-    // #define INHOMO_RECO 0
-    fprintf(stderr, "\nInhomo_Reco: %d\n", INHOMO_RECO);
+    fprintf(stderr, "\nInitializing MHR: %d\n", INHOMO_RECO);
     if (INHOMO_RECO) {
         
         init_MHR();
@@ -600,6 +592,7 @@ int main(int argc, char ** argv){
 
 
 
+    fprintf(stderr, "Storing data: %d\n", STORE_DATA);
     // Storing the global history of the IGM neutral fraction and brightness temperature contrast into a text-file
     if(STORE_DATA) {
         sprintf(filename, "%s/AveData_%f_%f.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
@@ -621,6 +614,7 @@ int main(int argc, char ** argv){
     }
 
     // Output the text-file containing the file names of all the 21cm PS calculated from the light-cone boxes
+    fprintf(stderr, "Storing 21cm PS filenames: %d\n", USE_LIGHTCONE);
     if(USE_LIGHTCONE) {
 
         sprintf(filename, "%s/delTps_lightcone_filenames_%f_%f.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
@@ -771,6 +765,7 @@ void ComputeTsBoxes() {
 
     // Initialise arrays to be used for the Ts.c computation //
     init_21cmMC_Ts_arrays();
+    fprintf(stderr, "Ts arrays initialized");
 
 
 
@@ -2955,6 +2950,7 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
                     if(PRINT_FILES) {
 
                         sprintf(filename, "%s/delTps_estimate_%f_%f_zstart%09.5f_zend%09.5f_%i_%.0fMpc_lighttravel.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2,slice_redshifts[full_index_LC[num_boxes_interp*HII_DIM]], slice_redshifts[full_index_LC[(num_boxes_interp+1)*HII_DIM]], HII_DIM, BOX_LEN);
+                        fprintf(stderr, "Writing output(1) to %s\n", filename);
                         F=fopen(filename, "wt");
                         for (ct=1; ct<NUM_BINS; ct++){
                             if (in_bin_ct[ct]>0)
@@ -2964,7 +2960,7 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
 
                         strcpy(lightcone_box_names[num_boxes_interp], filename);
 
-
+                        fprintf(stderr, "Finished writing\n");
                     }
                 }
 
@@ -3039,6 +3035,7 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
                 // now lets print out the k bins
                 if(PRINT_FILES) {
                     sprintf(filename, "%s/delTps_estimate_%f_%f_zstart%09.5f_zend%09.5f_%i_%.0fMpc_lighttravel.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2,slice_redshifts[full_index_LC[num_boxes_interp*HII_DIM]], slice_redshifts[full_index_LC[(num_boxes_interp+1)*HII_DIM]], HII_DIM, BOX_LEN);
+                    fprintf(stderr, "Writing output(2) to %s\n", filename);
                     F=fopen(filename, "wt");
                     for (ct=1; ct<NUM_BINS; ct++){
                         if (in_bin_ct[ct]>0)
@@ -3047,6 +3044,7 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
                     fclose(F);
 
                     strcpy(lightcone_box_names[num_boxes_interp], filename);
+                    fprintf(stderr, "Finished writing\n");
                 }
             }
         }
@@ -3081,12 +3079,14 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
         // now lets print out the k bins
         if(PRINT_FILES) {
             sprintf(filename, "%s/delTps_estimate_%f_%f_%f.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2,REDSHIFT_SAMPLE);
+            fprintf(stderr, "Writing output(3) to %s\n", filename);
             F=fopen(filename, "wt");
             for (ct=1; ct<NUM_BINS; ct++){
                 if (in_bin_ct[ct]>0)
                     fprintf(F, "%e\t%e\t%e\n", k_ave[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0)/sqrt(in_bin_ct[ct]+0.0));
             }
             fclose(F);
+            fprintf(stderr, "Finished writing\n");
         }
 
 

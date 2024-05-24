@@ -23,7 +23,7 @@ QSO_Redshift = 7.0842
 class Likelihood21cmFast_multiz(object):
     
     def __init__(self, k_values, PS_values, Error_k_values, PS_Error, Redshift, Redshifts_For_Prior, param_legend, Fiducial_Params, FlagOptions, param_string_names, NSplinePoints, 
-                        TsCalc_z, Foreground_cut, Shot_Noise_cut, IncludeLightCone, ModUncert, PriorLegend, NFValsQSO, PDFValsQSO, output_folder_location):
+                        TsCalc_z, Foreground_cut, Shot_Noise_cut, IncludeLightCone, ModUncert, PriorLegend, NFValsQSO, PDFValsQSO, output_folder_location, walker_folder_location):
         self.k_values = k_values
         self.PS_values = PS_values
         self.Error_k_values = Error_k_values
@@ -44,6 +44,7 @@ class Likelihood21cmFast_multiz(object):
         self.NFValsQSO = NFValsQSO
         self.PDFValsQSO = PDFValsQSO
         self.output_folder_location = output_folder_location
+        self.walker_folder_location = walker_folder_location
 
     def Likelihood(self,ctx):
 
@@ -171,7 +172,7 @@ class Likelihood21cmFast_multiz(object):
                 OutputGlobalAve = 0
 
         parameter_number = 0
-        create_file = open("Walker_%s.txt"%(StringArgument_other),"w")
+        create_file = open(f"{self.walker_folder_location}Walker_%s.txt"%(StringArgument_other),"w")
         create_file.write("FLAGS    %s    %s    %s    %s    %s    %s    %s\n"%(GenerateNewICs,Subcell_RSDs,IONISATION_FCOLL_TABLE,UseFcollTable,PerformTsCalc,INHOMO_RECO,OutputGlobalAve))
         
         if self.param_legend['ALPHA'] is True:            
@@ -245,7 +246,7 @@ class Likelihood21cmFast_multiz(object):
             RandomSeed = np.random.uniform(low=1,high=1e12,size=1)
 
         # Now create the cosmology file associated with this walker.
-        create_file = open("WalkerCosmology_%s.txt"%(StringArgument_other),"w")
+        create_file = open(f"{self.walker_folder_location}WalkerCosmology_%s.txt"%(StringArgument_other),"w")
         if self.FlagOptions['GENERATE_NEW_ICS'] is True:
             create_file.write("RANDOM_SEED    %s\n"%(RandomSeed[0]))
         else:
@@ -689,16 +690,16 @@ class Likelihood21cmFast_multiz(object):
 
 
         if self.FlagOptions['KEEP_ALL_DATA'] is True:
-            command = "mv Walker_%s.txt %s/WalkerData"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+            command = f"mv {self.walker_folder_location}Walker_%s.txt %s/WalkerData"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
             os.system(command) 
 
-            command = "mv WalkerCosmology_%s.txt %s/WalkerData"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+            command = f"mv {self.walker_folder_location}WalkerCosmology_%s.txt %s/WalkerData"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
             os.system(command) 
         else:
-            command = "rm Walker_%s.txt"%(StringArgument_other)
+            command = f"rm {self.walker_folder_location}Walker_%s.txt"%(StringArgument_other)
             os.system(command) 
 
-            command = "rm WalkerCosmology_%s.txt"%(StringArgument_other)
+            command = f"rm {self.walker_folder_location}WalkerCosmology_%s.txt"%(StringArgument_other)
             os.system(command) 
 
         return -0.5*total_sum,nf_vals
