@@ -50,7 +50,7 @@
 //#define HII_DIM (int) 100 // number of cells for the low-res box
 
 /****** New in v1.1. ****** Threading parameters  ***/
-#define NUMCORES (int) 4 // # of cores you wish to allocate (must be shared mem)
+#define NUMCORES (int) 1 // # of cores you wish to allocate (must be shared mem)
 #define RAM (float) 16 // physical memory in GB available
 /******** END USER CHANGABLE DEFINITIONS   **********/
 
