@@ -1,6 +1,6 @@
-2024-05-20 20:36:10,844 INFO:Using CosmoHammer 0.2.1
-2024-05-20 20:36:10,844 INFO:Using emcee 1.2.0
-2024-05-20 20:36:10,851 INFO:Sampler: <class 'CosmoHammer_21CMMC.sampler.CosmoHammerSampler.CosmoHammerSampler'>
+2024-05-25 08:17:03,246 INFO:Using CosmoHammer 0.2.1
+2024-05-25 08:17:03,246 INFO:Using emcee 1.2.0
+2024-05-25 08:17:03,250 INFO:Sampler: <class 'CosmoHammer_21CMMC.sampler.CosmoHammerSampler.CosmoHammerSampler'>
 configuration: 
   Burnin iterations: 1
   Samples iterations: 1
@@ -15,4 +15,4 @@ Core Modules:
 Likelihood Modules: 
   Likelihood21cmFast_multiz
 
-2024-05-20 20:36:10,851 INFO:start burn in
+2024-05-25 08:17:03,250 INFO:start burn in

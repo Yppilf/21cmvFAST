@@ -1,13 +1,14 @@
-#include "../Parameter_files/INIT_PARAMS.H"
-#include "../Parameter_files/ANAL_PARAMS.H"
-#include "../Parameter_files/Variables.h"
-#include "bubble_helper_progs.c"
-#include "heating_helper_progs.c"
-#include "gsl/gsl_sf_erf.h"
-#include "filter.c"
-#include <sys/stat.h>
+// #include "../Parameter_files/INIT_PARAMS.H"
+// #include "../Parameter_files/ANAL_PARAMS.H"
+// #include "../Parameter_files/Variables.h"
+// #include "init_21cmMC_Ts_arrays.c"
+// #include "bubble_helper_progs.c"
+// #include "heating_helper_progs.c"
+// #include "gsl/gsl_sf_erf.h"
+// #include "filter.c"
+// #include <sys/stat.h>
+#include "drive_21cmMC_streamlined.h"
 
-#include "init_21cmMC_Ts_arrays.c"
 
 /*
 

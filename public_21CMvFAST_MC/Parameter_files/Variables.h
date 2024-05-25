@@ -1,3 +1,5 @@
+#ifndef _VARIABLES_H_
+#define _VARIABLES_H_
 // Globals for drive_21cmMC_streamlined.c
 
 /* Maximum allowed value for the kinetic temperature. Useful to set to avoid some spurious behaviour
@@ -126,3 +128,5 @@ unsigned long long DIM_MOCK_OBS_CUBIC,DIM_MOCK_OBS,DIM_MOCK_OBS_MID,DIM_MOCK_OBS
 
 float *z_re, *Gamma12;
 fftwf_complex *N_rec_unfiltered, *N_rec_filtered;
+
+#endif
