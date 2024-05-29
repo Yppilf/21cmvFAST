@@ -679,7 +679,7 @@ int main(int argc, char ** argv){
 }
 
 void ComputeTsBoxes() {
-  printf("COMPUTING TS!!  \n");
+  printf("COMPUTING TS!!\n");
 
     /* This is an entire re-write of Ts.c from 21cmFAST. You can refer back to Ts.c in 21cmFAST if this become a little obtuse. The computation has remained the same */
 
@@ -767,7 +767,7 @@ void ComputeTsBoxes() {
 
     // Initialise arrays to be used for the Ts.c computation //
     init_21cmMC_Ts_arrays();
-    fprintf(stderr, "Ts arrays initialized");
+    fprintf(stderr, "Ts arrays initialized\n");
 
 
 
@@ -785,43 +785,40 @@ void ComputeTsBoxes() {
 
     // Initialize some interpolation tables
     init_heat();
+    fprintf(stderr, "Finished init_heat()\n");
 
-//JBM:initialize the vcb effect: read the interpolation tables
- char ending_filename [10];
- int len = sprintf(ending_filename,"_%d.dat",FEEDBACK_LEVEL);
-
-
- char filename_fcollapse [200];
- strcpy (filename_fcollapse,FILENAME_FCOLL_VCB);
- strcat (filename_fcollapse, ending_filename);
+    //JBM:initialize the vcb effect: read the interpolation tables
+    char ending_filename [10];
+    int len = sprintf(ending_filename,"_%d.dat",FEEDBACK_LEVEL);
 
 
-  F = fopen(filename_fcollapse,"r");
-  double trash;
+    char filename_fcollapse [200];
+    strcpy (filename_fcollapse,FILENAME_FCOLL_VCB);
+    strcat (filename_fcollapse, ending_filename);
 
-  for(i=0;i<NZINT;i++) {
-    for(j=0;j<NVINT;j++) {
-      fscanf(F, "%le %le %le" , &trash, &trash, &logFcoll_vcb[i][j]); //it has z, v, Fcoll, but we don't save z or v.
-//      printf("%d %d %le \n",i,j,exp(logFcoll_vcb[i][j]));
+
+    F = fopen(filename_fcollapse,"r");
+    double trash;
+
+    for(i=0;i<NZINT;i++) {
+        for(j=0;j<NVINT;j++) {
+            fscanf(F, "%le %le %le" , &trash, &trash, &logFcoll_vcb[i][j]); //it has z, v, Fcoll, but we don't save z or v.
+            // printf("%d %d %le \n",i,j,exp(logFcoll_vcb[i][j]));
+        }
     }
-  }
 
-//JBM:and the sigma (M_cool(v,z),z,v) too: read the interpolation table
- char filename_sigmacool [200];
- strcpy (filename_sigmacool,FILENAME_SIGMACOOL_VCB);
- strcat (filename_sigmacool, ending_filename);
-  F = fopen(filename_sigmacool,"r");
+    //JBM:and the sigma (M_cool(v,z),z,v) too: read the interpolation table
+    char filename_sigmacool [200];
+    strcpy (filename_sigmacool,FILENAME_SIGMACOOL_VCB);
+    strcat (filename_sigmacool, ending_filename);
+    F = fopen(filename_sigmacool,"r");
 
-  for(i=0;i<NZINT;i++) {
-    for(j=0;j<NVINT;j++) {
-      fscanf(F, "%le %le %le" , &trash, &trash, &sigmacool_vcb[i][j]); //it has z, v, Fcoll, but we don't save z or v.
-//      printf("%d %d %le \n",i,j,exp(logFcoll_vcb[i][j]));
+    for(i=0;i<NZINT;i++) {
+        for(j=0;j<NVINT;j++) {
+            fscanf(F, "%le %le %le" , &trash, &trash, &sigmacool_vcb[i][j]); //it has z, v, Fcoll, but we don't save z or v.
+            // printf("%d %d %le \n",i,j,exp(logFcoll_vcb[i][j]));
+        }
     }
-  }
-
-
-
-
 
     // check if we are in the really high z regime before the first stars; if so, simple
     if (REDSHIFT > Z_HEAT_MAX){
@@ -871,7 +868,7 @@ void ComputeTsBoxes() {
         /////////////// Create the z=0 non-linear density fields smoothed on scale R to be used in computing fcoll //////////////
         R = L_FACTOR*BOX_LEN/(float)HII_DIM;
         R_factor = pow(R_XLy_MAX/R, 1/(float)NUM_FILTER_STEPS_FOR_Ts);
-//      R_factor = pow(E, log(HII_DIM)/(float)NUM_FILTER_STEPS_FOR_Ts);
+        // R_factor = pow(E, log(HII_DIM)/(float)NUM_FILTER_STEPS_FOR_Ts);
 
 
         ///////////////////  Read in density box at z-prime  ///////////////
@@ -908,6 +905,7 @@ void ComputeTsBoxes() {
 
 
         //JBM:we also read the velocity field at z_dec, also in the /Boxes folder.
+        fprintf(stderr, "Use relative velocities: %d\n", USE_RELATIVE_VELOCITIES);
         if(USE_RELATIVE_VELOCITIES){
         sprintf(filename, "%s/smoothed_vcb_x_z0.00_%i_%.0fMpc",BOXES_INPUT_FOLDER, HII_DIM, BOX_LEN);
             F = fopen(filename, "rb");
@@ -922,14 +920,14 @@ void ComputeTsBoxes() {
         }
 
 
-
+        fprintf(stderr, "Transform unfiltered box to k-space to prepare for filtering\n");
         ////////////////// Transform unfiltered box to k-space to prepare for filtering /////////////////
         plan = fftwf_plan_dft_r2c_3d(HII_DIM, HII_DIM, HII_DIM, (float *)unfiltered_box, (fftwf_complex *)unfiltered_box, FFTW_ESTIMATE);
         fftwf_execute(plan);
         fftwf_destroy_plan(plan);
         fftwf_cleanup();
 
-	//JBM:transform the vcb box as well
+	    //JBM:transform the vcb box as well
         plan = fftwf_plan_dft_r2c_3d(HII_DIM, HII_DIM, HII_DIM, (float *)unfiltered_vcb_box, (fftwf_complex *)unfiltered_vcb_box, FFTW_ESTIMATE);
         fftwf_execute(plan);
         fftwf_destroy_plan(plan);
@@ -944,7 +942,7 @@ void ComputeTsBoxes() {
         }
 
 
-
+        fprintf(stderr, "Smooth the density field\n");
         // Smooth the density field, at the same time store the minimum and maximum densities for their usage in the interpolation tables
         for (R_ct=0; R_ct<NUM_FILTER_STEPS_FOR_Ts; R_ct++){
 
@@ -1055,6 +1053,7 @@ void ComputeTsBoxes() {
 
         ////////////////////////////    END INITIALIZATION   /////////////////////////////
 
+        fprintf(stderr, "Main integral\n");
         // main trapezoidal integral over z' (see eq. ? in Mesinger et al. 2009)
         zp = REDSHIFT*1.0001; //higher for rounding
         while (zp < Z_HEAT_MAX)
@@ -1085,7 +1084,7 @@ void ComputeTsBoxes() {
         ////////////////////////////    Create and fill interpolation tables to be used by Ts.c   /////////////////////////////
 
 
-
+        fprintf(stderr, "Initiating interpolation tables\n");
         // An interpolation table for f_coll (delta vs redshift)
         init_FcollTable(determine_zpp_min,determine_zpp_max);
 
@@ -1121,12 +1120,6 @@ void ComputeTsBoxes() {
 
         }
 
-
-
-
-
-
-
         // Create the interpolation tables for the derivative of the collapsed fraction and the collapse fraction itself
           for(ii=0;ii<NUM_FILTER_STEPS_FOR_Ts;ii++) {
               for(i=0;i<zpp_interp_points;i++) {
@@ -1154,7 +1147,7 @@ void ComputeTsBoxes() {
 
 
 
-
+        fprintf(stderr, "Determining and evaluating grid point locations for solving interpolation tables\n");
         // Determine the grid point locations for solving the interpolation tables
         for (box_ct=HII_TOT_NUM_PIXELS; box_ct--;){
             for (R_ct=NUM_FILTER_STEPS_FOR_Ts; R_ct--;){
@@ -1176,6 +1169,7 @@ void ComputeTsBoxes() {
 
         counter = 0;
 
+        fprintf(stderr, "Starting calculation for IGM spin temperature\n");
         // This is the main loop for calculating the IGM spin temperature. Structure drastically different from Ts.c in 21cmFAST, however algorithm and computation remain the same.
         while (zp > REDSHIFT){
             // check if we will next compute the spin temperature (i.e. if this is the final zp step)
@@ -1327,8 +1321,8 @@ void ComputeTsBoxes() {
 
             // Leave the original 21cmFAST code for reference. Refer to Greig & Mesinger (2017) for the new parameterisation.
             const_zp_prefactor = ( L_X * Luminosity_converstion_factor ) / NU_X_THRESH * C * F_STAR * OMb * RHOcrit * pow(CMperMPC, -3) * pow(1+zp, X_RAY_SPEC_INDEX+3);
-//          This line below is kept purely for reference w.r.t to the original 21cmFAST
-//            const_zp_prefactor = ZETA_X * X_RAY_SPEC_INDEX / NU_X_THRESH * C * F_STAR * OMb * RHOcrit * pow(CMperMPC, -3) * pow(1+zp, X_RAY_SPEC_INDEX+3);
+            // This line below is kept purely for reference w.r.t to the original 21cmFAST
+            // const_zp_prefactor = ZETA_X * X_RAY_SPEC_INDEX / NU_X_THRESH * C * F_STAR * OMb * RHOcrit * pow(CMperMPC, -3) * pow(1+zp, X_RAY_SPEC_INDEX+3);
 
             //////////////////////////////  LOOP THROUGH BOX //////////////////////////////
 
@@ -1448,21 +1442,6 @@ void ComputeTsBoxes() {
                             dfcoll_interp2[dens_grid_int_vals[box_ct][R_ct]][R_ct]
                             *(delNL0_rev[box_ct][R_ct] - density_gridpoints[dens_grid_int_vals[box_ct][R_ct]][R_ct]) );
                       }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                         dxheat_dt += dfcoll_dz_val * ( (freq_int_heat_tbl_diff[m_xHII_low][R_ct])*inverse_val + freq_int_heat_tbl[m_xHII_low][R_ct] );
                         dxion_source_dt += dfcoll_dz_val * ( (freq_int_ion_tbl_diff[m_xHII_low][R_ct])*inverse_val + freq_int_ion_tbl[m_xHII_low][R_ct] );
@@ -1629,10 +1608,12 @@ void ComputeTsBoxes() {
             counter += 1;
         } // end main integral loop over z'
 
+        fprintf(stderr, "Start freeing Ts memory\n");
         destroy_21cmMC_Ts_arrays();
         destruct_heat();
     }
 
+    fprintf(stderr, "Start freeing interpolation table memory\n");
     for(i=0;i<Numzp_for_table;i++) {
         for(j=0;j<X_RAY_Tvir_POINTS;j++) {
             free(Fcoll_R_Table[i][j]);
