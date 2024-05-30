@@ -39,22 +39,22 @@
 //#define BOX_LEN (float) 900 // in Mpc
 //#define BOX_LEN (float) 600 // in Mpc
 //#define BOX_LEN (float) 300 // in Mpc
-#define BOX_LEN (float) 100
+#define BOX_LEN (float) 300
 
 //#define DIM (int) 900 // number of cells for the high-res box (sampling ICs) along a principal axis
 //#define DIM (int) 600 // number of cells for the high-res box (sampling ICs) along a principal axis
 //#define DIM (int) 300 // number of cells for the high-res box (sampling ICs) along a principal axis
-#define DIM (int) 100
+#define DIM (int) 900
 
 // to avoid sampling issues, DIM should be at least 3 or 4 times HII_DIM, and an integer multiple)
 //#define HII_DIM (int) 300 // number of cells for the low-res box
 //#define HII_DIM (int) 200 // number of cells for the low-res box
 //#define HII_DIM (int) 100 // number of cells for the low-res box
-#define HII_DIM (int) 25
+#define HII_DIM (int) 300
 
 /****** New in v1.1. ****** Threading parameters  ***/
 #define NUMCORES (int) 1 // # of cores you wish to allocate (must be shared mem)
-#define RAM (float) 4 // physical memory in GB available
+#define RAM (float) 16 // physical memory in GB available
 /******** END USER CHANGABLE DEFINITIONS   **********/
 
 #include "ANAL_PARAMS.H"

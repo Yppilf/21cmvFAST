@@ -1610,6 +1610,7 @@ void ComputeTsBoxes() {
 
         fprintf(stderr, "Start freeing Ts memory\n");
         destroy_21cmMC_Ts_arrays();
+        fprintf(stderr, "Freed Ts arrays, Starting destruct_heat()\n");
         destruct_heat();
     }
 
@@ -4697,6 +4698,55 @@ void destroy_21cmMC_HII_arrays(int skip_deallocate) {
 }
 
 void destroy_21cmMC_Ts_arrays() {
+    // Set the pointers to NULL to avoid double free errors
+    box = NULL;
+    unfiltered_box = NULL;
+    box_vcb = NULL;
+    unfiltered_vcb_box = NULL;
+    Tk_box = NULL;
+    x_e_box = NULL;
+    Ts = NULL;
+    inverse_diff = NULL;
+    zpp_growth = NULL;
+    fcoll_R_grid = NULL;
+    dfcoll_dz_grid = NULL;
+    fcoll_R_array = NULL;
+    Sigma_Tmin_grid = NULL;
+    grid_dens = NULL;
+    density_gridpoints = NULL;
+    ST_over_PS_arg_grid = NULL;
+    logFcoll_vcb = NULL;
+    sigmacool_vcb = NULL;
+    dens_grid_int_vals = NULL;
+    delNL0_rev = NULL;
+    vcb_rev = NULL;
+    fcoll_interp1 = NULL;
+    fcoll_interp2 = NULL;
+    dfcoll_interp1 = NULL;
+    dfcoll_interp2 = NULL;
+    zpp_edge = NULL;
+    sigma_atR = NULL;
+    sigma_Tmin = NULL;
+    ST_over_PS = NULL;
+    sum_lyn = NULL;
+    zpp_for_evolve_list = NULL;
+    R_values = NULL;
+    SingleVal_float = NULL;
+    delNL0_bw = NULL;
+    delNL0_Offset = NULL;
+    delNL0_LL = NULL;
+    delNL0_UL = NULL;
+    delNL0_ibw = NULL;
+    log10delNL0_diff = NULL;
+    log10delNL0_diff_UL = NULL;
+    freq_int_heat_tbl = NULL;
+    freq_int_ion_tbl = NULL;
+    freq_int_lya_tbl = NULL;
+    freq_int_heat_tbl_diff = NULL;
+    freq_int_ion_tbl_diff = NULL;
+    freq_int_lya_tbl_diff = NULL;
+    dstarlya_dt_prefactor = NULL;
+    SingleVal_int = NULL;
 
     int i,j;
 
@@ -4706,7 +4756,9 @@ void destroy_21cmMC_Ts_arrays() {
     fftwf_free(box_vcb);
     fftwf_free(unfiltered_vcb_box);
 
-    free(Tk_box); free(x_e_box); free(Ts);
+    free(Tk_box); 
+    free(x_e_box); 
+    free(Ts);
 
     for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
         for(j=0;j<zpp_interp_points;j++) {
@@ -4739,7 +4791,6 @@ void destroy_21cmMC_Ts_arrays() {
         free(sigmacool_vcb[i]);
     }
     free(sigmacool_vcb);
-
 
     free(ST_over_PS_arg_grid);
     free(Sigma_Tmin_grid);

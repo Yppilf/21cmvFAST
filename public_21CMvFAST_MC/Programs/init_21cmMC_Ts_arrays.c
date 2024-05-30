@@ -110,6 +110,56 @@ void free_2D_short_array(short*** ptr, size_t dim1, size_t dim2) {
 }
 
 void free_memory() {
+    // Initialize the pointers to NULL to avoid double frees
+    box = NULL;
+    unfiltered_box = NULL;
+    box_vcb = NULL;
+    unfiltered_vcb_box = NULL;
+    Tk_box = NULL;
+    x_e_box = NULL;
+    Ts = NULL;
+    inverse_diff = NULL;
+    zpp_growth = NULL;
+    fcoll_R_grid = NULL;
+    dfcoll_dz_grid = NULL;
+    fcoll_R_array = NULL;
+    Sigma_Tmin_grid = NULL;
+    grid_dens = NULL;
+    density_gridpoints = NULL;
+    ST_over_PS_arg_grid = NULL;
+    logFcoll_vcb = NULL;
+    sigmacool_vcb = NULL;
+    dens_grid_int_vals = NULL;
+    delNL0_rev = NULL;
+    vcb_rev = NULL;
+    fcoll_interp1 = NULL;
+    fcoll_interp2 = NULL;
+    dfcoll_interp1 = NULL;
+    dfcoll_interp2 = NULL;
+    zpp_edge = NULL;
+    sigma_atR = NULL;
+    sigma_Tmin = NULL;
+    ST_over_PS = NULL;
+    sum_lyn = NULL;
+    zpp_for_evolve_list = NULL;
+    R_values = NULL;
+    SingleVal_float = NULL;
+    delNL0_bw = NULL;
+    delNL0_Offset = NULL;
+    delNL0_LL = NULL;
+    delNL0_UL = NULL;
+    delNL0_ibw = NULL;
+    log10delNL0_diff = NULL;
+    log10delNL0_diff_UL = NULL;
+    freq_int_heat_tbl = NULL;
+    freq_int_ion_tbl = NULL;
+    freq_int_lya_tbl = NULL;
+    freq_int_heat_tbl_diff = NULL;
+    freq_int_ion_tbl_diff = NULL;
+    freq_int_lya_tbl_diff = NULL;
+    dstarlya_dt_prefactor = NULL;
+    SingleVal_int = NULL;
+
     fprintf(stderr, "\nFreeing memory, something went wrong during allocation.\n");
     free_pointer_fftw(&box);
     free_pointer_fftw(&unfiltered_box);
@@ -159,7 +209,6 @@ void free_memory() {
     free_2D_double_array(&freq_int_lya_tbl_diff,x_int_NXHII,NUM_FILTER_STEPS_FOR_Ts);
     free_pointer_double(&dstarlya_dt_prefactor);
     free_pointer_short(&SingleVal_int);
-    // Repeat for other global allocations...
 }
 
 // TS: New version of the function, originally from drive_21cmMC_streamlined.c
