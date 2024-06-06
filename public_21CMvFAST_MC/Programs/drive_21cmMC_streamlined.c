@@ -106,6 +106,15 @@ unsigned long long coeval_box_pos_FFT(int LOS_dir,int xi,int yi,int zi){
     return position;
 }
 
+int file_exists(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (file) {
+        fclose(file);
+        return 1;
+    }
+    return 0;
+}
+
 int main(int argc, char ** argv){
      fprintf(stderr, "\n----------------------------\nStarting drive_21cmMC_streamlined.c\n----------------------------\n");
 
@@ -201,7 +210,6 @@ int main(int argc, char ** argv){
     // The MCMC sets the toggle, this C file reads the toggle and uses/sets the parameter values appropriately
 
     sprintf(filename,"%sWalker_%1.6lf_%1.6lf.txt",WALKER_FOLDER, INDIVIDUAL_ID,INDIVIDUAL_ID_2);
-    fprintf(stderr, "Printing to %s\n", filename);
     fprintf(stderr, "\n----------------------------\nReading parameter data from %s\n----------------------------\n", filename);
     F = fopen(filename,"rt");
 
@@ -598,34 +606,39 @@ int main(int argc, char ** argv){
     // Storing the global history of the IGM neutral fraction and brightness temperature contrast into a text-file
     if(STORE_DATA) {
         sprintf(filename, "%s/AveData_%f_%f.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
-        F=fopen(filename, "wt");
-        for(i=0;i<N_USER_REDSHIFT;i++) {
-            fprintf(F,"%f\t%e\t%e\n",redshifts[i],aveNF[i],aveTb[i]);
+        if (OVERWRITE_OUTPUT || !file_exists(filename)){
+            F=fopen(filename, "wt");
+            for(i=0;i<N_USER_REDSHIFT;i++) {
+                fprintf(F,"%f\t%e\t%e\n",redshifts[i],aveNF[i],aveTb[i]);
+            }
+            fclose(F);
         }
-        fclose(F);
     }
 
     //JBM:also save the spin and gas temperatures
     if(STORE_DATA) {
         sprintf(filename, "%s/AveTemps_%f_%f.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
-        F=fopen(filename, "wt");
-        for(i=0;i<N_USER_REDSHIFT;i++) {
-            fprintf(F,"%f\t%e\t%e\t%e\t%e\n",redshifts[i],aveTkin[i],aveTspin[i],aveTspin_inv[i], aveXalpha[i]);
+        if (OVERWRITE_OUTPUT || !file_exists(filename) ){
+            F=fopen(filename, "wt");
+            for(i=0;i<N_USER_REDSHIFT;i++) {
+                fprintf(F,"%f\t%e\t%e\t%e\t%e\n",redshifts[i],aveTkin[i],aveTspin[i],aveTspin_inv[i], aveXalpha[i]);
+            }
+            fclose(F);
         }
-        fclose(F);
     }
 
     // Output the text-file containing the file names of all the 21cm PS calculated from the light-cone boxes
     fprintf(stderr, "Storing 21cm PS filenames: %d\n", USE_LIGHTCONE);
     if(USE_LIGHTCONE) {
-
         sprintf(filename, "%s/delTps_lightcone_filenames_%f_%f.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2);
-        fprintf(stderr, "Outputting spin temperature for lightcone to %s", filename);
-        F=fopen(filename, "w");
-        for(i=0;i<total_num_boxes;i++) {
-            fprintf(F,"%s\n",lightcone_box_names[i]);
+        if (OVERWRITE_OUTPUT || !file_exists(filename) ){
+            fprintf(stderr, "Outputting spin temperature for lightcone to %s", filename);
+            F=fopen(filename, "w");
+            for(i=0;i<total_num_boxes;i++) {
+                fprintf(F,"%s\n",lightcone_box_names[i]);
+            }
+            fclose(F);
         }
-        fclose(F);
     }
 
 
@@ -1011,11 +1024,6 @@ void ComputeTsBoxes() {
                         if(USE_RELATIVE_VELOCITIES && AVG_REL_VELOCITY){
                           vcb_rev[HII_R_INDEX(i,j,k)][R_ct] = VCB_AVG;
                         }
-
-
-
-
-
                     }
                 }
             }
@@ -2934,17 +2942,17 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
                     if(PRINT_FILES) {
 
                         sprintf(filename, "%s/delTps_estimate_%f_%f_zstart%09.5f_zend%09.5f_%i_%.0fMpc_lighttravel.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2,slice_redshifts[full_index_LC[num_boxes_interp*HII_DIM]], slice_redshifts[full_index_LC[(num_boxes_interp+1)*HII_DIM]], HII_DIM, BOX_LEN);
-                        fprintf(stderr, "Writing output(1) to %s\n", filename);
-                        F=fopen(filename, "wt");
-                        for (ct=1; ct<NUM_BINS; ct++){
-                            if (in_bin_ct[ct]>0)
-                                fprintf(F, "%e\t%e\t%e\n", k_ave[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0)/sqrt(in_bin_ct[ct]+0.0));
+                        if(OVERWRITE_OUTPUT || !file_exists(filename)){
+                            fprintf(stderr, "Writing output(1) to %s\n", filename);
+                            F=fopen(filename, "wt");
+                            for (ct=1; ct<NUM_BINS; ct++){
+                                if (in_bin_ct[ct]>0)
+                                    fprintf(F, "%e\t%e\t%e\n", k_ave[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0)/sqrt(in_bin_ct[ct]+0.0));
+                            }
+                            fclose(F);
+                            fprintf(stderr, "Finished writing\n");
                         }
-                        fclose(F);
-
                         strcpy(lightcone_box_names[num_boxes_interp], filename);
-
-                        fprintf(stderr, "Finished writing\n");
                     }
                 }
 
@@ -3019,16 +3027,17 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
                 // now lets print out the k bins
                 if(PRINT_FILES) {
                     sprintf(filename, "%s/delTps_estimate_%f_%f_zstart%09.5f_zend%09.5f_%i_%.0fMpc_lighttravel.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2,slice_redshifts[full_index_LC[num_boxes_interp*HII_DIM]], slice_redshifts[full_index_LC[(num_boxes_interp+1)*HII_DIM]], HII_DIM, BOX_LEN);
-                    fprintf(stderr, "Writing output(2) to %s\n", filename);
-                    F=fopen(filename, "wt");
-                    for (ct=1; ct<NUM_BINS; ct++){
-                        if (in_bin_ct[ct]>0)
-                            fprintf(F, "%e\t%e\t%e\n", k_ave[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0)/sqrt(in_bin_ct[ct]+0.0));
+                    if(OVERWRITE_OUTPUT || !file_exists(filename)){
+                        fprintf(stderr, "Writing output(2) to %s\n", filename);
+                        F=fopen(filename, "wt");
+                        for (ct=1; ct<NUM_BINS; ct++){
+                            if (in_bin_ct[ct]>0)
+                                fprintf(F, "%e\t%e\t%e\n", k_ave[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0)/sqrt(in_bin_ct[ct]+0.0));
+                        }
+                        fclose(F);
+                        fprintf(stderr, "Finished writing\n");
                     }
-                    fclose(F);
-
                     strcpy(lightcone_box_names[num_boxes_interp], filename);
-                    fprintf(stderr, "Finished writing\n");
                 }
             }
         }
@@ -3063,14 +3072,16 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
         // now lets print out the k bins
         if(PRINT_FILES) {
             sprintf(filename, "%s/delTps_estimate_%f_%f_%f.txt",OUTPUT_FOLDER,INDIVIDUAL_ID,INDIVIDUAL_ID_2,REDSHIFT_SAMPLE);
-            fprintf(stderr, "Writing output(3) to %s\n", filename);
-            F=fopen(filename, "wt");
-            for (ct=1; ct<NUM_BINS; ct++){
-                if (in_bin_ct[ct]>0)
-                    fprintf(F, "%e\t%e\t%e\n", k_ave[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0)/sqrt(in_bin_ct[ct]+0.0));
+            if(OVERWRITE_OUTPUT || !file_exists(filename)){
+                fprintf(stderr, "Writing output(3) to %s\n", filename);
+                F=fopen(filename, "wt");
+                for (ct=1; ct<NUM_BINS; ct++){
+                    if (in_bin_ct[ct]>0)
+                        fprintf(F, "%e\t%e\t%e\n", k_ave[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0), p_box[ct]/(in_bin_ct[ct]+0.0)/sqrt(in_bin_ct[ct]+0.0));
+                }
+                fclose(F);
+                fprintf(stderr, "Finished writing\n");
             }
-            fclose(F);
-            fprintf(stderr, "Finished writing\n");
         }
 
 
@@ -4357,21 +4368,6 @@ void GeneratePS_aniso(int CO_EVAL, double AverageTb, char* filename) {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //JBM: output velocity power spectrum, just a diagnostic
 //note that it's P(v) and not P(v^2).
 
@@ -4457,15 +4453,6 @@ void GeneratePS_vel() {
         } // end looping through k box
 
 }
-
-
-
-
-
-
-
-
-
 
 /**** Arrays declared and used *****/
 
@@ -4698,164 +4685,159 @@ void destroy_21cmMC_HII_arrays(int skip_deallocate) {
 }
 
 void destroy_21cmMC_Ts_arrays() {
-    // Set the pointers to NULL to avoid double free errors
-    box = NULL;
-    unfiltered_box = NULL;
-    box_vcb = NULL;
-    unfiltered_vcb_box = NULL;
-    Tk_box = NULL;
-    x_e_box = NULL;
-    Ts = NULL;
-    inverse_diff = NULL;
-    zpp_growth = NULL;
-    fcoll_R_grid = NULL;
-    dfcoll_dz_grid = NULL;
-    fcoll_R_array = NULL;
-    Sigma_Tmin_grid = NULL;
-    grid_dens = NULL;
-    density_gridpoints = NULL;
-    ST_over_PS_arg_grid = NULL;
-    logFcoll_vcb = NULL;
-    sigmacool_vcb = NULL;
-    dens_grid_int_vals = NULL;
-    delNL0_rev = NULL;
-    vcb_rev = NULL;
-    fcoll_interp1 = NULL;
-    fcoll_interp2 = NULL;
-    dfcoll_interp1 = NULL;
-    dfcoll_interp2 = NULL;
-    zpp_edge = NULL;
-    sigma_atR = NULL;
-    sigma_Tmin = NULL;
-    ST_over_PS = NULL;
-    sum_lyn = NULL;
-    zpp_for_evolve_list = NULL;
-    R_values = NULL;
-    SingleVal_float = NULL;
-    delNL0_bw = NULL;
-    delNL0_Offset = NULL;
-    delNL0_LL = NULL;
-    delNL0_UL = NULL;
-    delNL0_ibw = NULL;
-    log10delNL0_diff = NULL;
-    log10delNL0_diff_UL = NULL;
-    freq_int_heat_tbl = NULL;
-    freq_int_ion_tbl = NULL;
-    freq_int_lya_tbl = NULL;
-    freq_int_heat_tbl_diff = NULL;
-    freq_int_ion_tbl_diff = NULL;
-    freq_int_lya_tbl_diff = NULL;
-    dstarlya_dt_prefactor = NULL;
-    SingleVal_int = NULL;
+    // Helper macro to safely free memory and set pointer to NULL
+    #define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
+    #define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
 
-    int i,j;
+    int i, j;
 
-    fftwf_free(box);
-    fftwf_free(unfiltered_box);
+    printf("Freeing box and related pointers\n");
 
-    fftwf_free(box_vcb);
-    fftwf_free(unfiltered_vcb_box);
+    SAFE_FFTWF_FREE(box);
+    SAFE_FFTWF_FREE(unfiltered_box);
+    SAFE_FFTWF_FREE(box_vcb);
+    SAFE_FFTWF_FREE(unfiltered_vcb_box);
 
-    free(Tk_box); 
-    free(x_e_box); 
-    free(Ts);
+    SAFE_FREE(Tk_box);
+    SAFE_FREE(x_e_box);
+    SAFE_FREE(Ts);
 
-    for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
-        for(j=0;j<zpp_interp_points;j++) {
-            free(fcoll_R_grid[i][j]);
-            free(dfcoll_dz_grid[i][j]);
+    printf("Freeing fcoll_R_grid and dfcoll_dz_grid\n");
+
+    if(fcoll_R_grid) {
+        for(i = 0; i < NUM_FILTER_STEPS_FOR_Ts; i++) {
+            if(fcoll_R_grid[i]) {
+                for(j = 0; j < zpp_interp_points; j++) {
+                    SAFE_FREE(fcoll_R_grid[i][j]);
+                    SAFE_FREE(dfcoll_dz_grid[i][j]);
+                }
+                SAFE_FREE(fcoll_R_grid[i]);
+                SAFE_FREE(dfcoll_dz_grid[i]);
+            }
         }
-        free(fcoll_R_grid[i]);
-        free(dfcoll_dz_grid[i]);
+        SAFE_FREE(fcoll_R_grid);
+        SAFE_FREE(dfcoll_dz_grid);
     }
-    free(fcoll_R_grid);
-    free(dfcoll_dz_grid);
 
-    for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
-        free(grid_dens[i]);
+    printf("Freeing grid_dens\n");
+
+    if(grid_dens) {
+        for(i = 0; i < NUM_FILTER_STEPS_FOR_Ts; i++) {
+            SAFE_FREE(grid_dens[i]);
+        }
+        SAFE_FREE(grid_dens);
     }
-    free(grid_dens);
 
-    for(i=0;i<dens_Ninterp;i++) {
-        free(density_gridpoints[i]);
+    printf("Freeing density_gridpoints\n");
+
+    if(density_gridpoints) {
+        for(i = 0; i < dens_Ninterp; i++) {
+            SAFE_FREE(density_gridpoints[i]);
+        }
+        SAFE_FREE(density_gridpoints);
     }
-    free(density_gridpoints);
 
-    //JBM we free the collapse array
-    for(i=0;i<NZINT;i++) {
-        free(logFcoll_vcb[i]);
+    printf("Freeing logFcoll_vcb\n");
+
+    if(logFcoll_vcb) {
+        for(i = 0; i < NZINT; i++) {
+            SAFE_FREE(logFcoll_vcb[i]);
+        }
+        SAFE_FREE(logFcoll_vcb);
     }
-    free(logFcoll_vcb);
-    //JBM we free the collapse array
-    for(i=0;i<NZINT;i++) {
-        free(sigmacool_vcb[i]);
+
+    printf("Freeing sigmacool_vcb\n");
+
+    if(sigmacool_vcb) {
+        for(i = 0; i < NZINT; i++) {
+            SAFE_FREE(sigmacool_vcb[i]);
+        }
+        SAFE_FREE(sigmacool_vcb);
     }
-    free(sigmacool_vcb);
 
-    free(ST_over_PS_arg_grid);
-    free(Sigma_Tmin_grid);
-    free(fcoll_R_array);
-    free(zpp_growth);
-    free(inverse_diff);
+    SAFE_FREE(ST_over_PS_arg_grid);
+    SAFE_FREE(Sigma_Tmin_grid);
+    SAFE_FREE(fcoll_R_array);
+    SAFE_FREE(zpp_growth);
+    SAFE_FREE(inverse_diff);
 
-    for(i=0;i<dens_Ninterp;i++) {
-        free(fcoll_interp1[i]);
-        free(fcoll_interp2[i]);
-        free(dfcoll_interp1[i]);
-        free(dfcoll_interp2[i]);
+    printf("Freeing fcoll_interp and dfcoll_interp\n");
+
+    if(fcoll_interp1) {
+        for(i = 0; i < dens_Ninterp; i++) {
+            SAFE_FREE(fcoll_interp1[i]);
+            SAFE_FREE(fcoll_interp2[i]);
+            SAFE_FREE(dfcoll_interp1[i]);
+            SAFE_FREE(dfcoll_interp2[i]);
+        }
+        SAFE_FREE(fcoll_interp1);
+        SAFE_FREE(fcoll_interp2);
+        SAFE_FREE(dfcoll_interp1);
+        SAFE_FREE(dfcoll_interp2);
     }
-    free(fcoll_interp1);
-    free(fcoll_interp2);
-    free(dfcoll_interp1);
-    free(dfcoll_interp2);
 
-    for(i=0;i<HII_TOT_NUM_PIXELS;i++) {
-        free(dens_grid_int_vals[i]);
-        free(delNL0_rev[i]);
+    printf("Freeing dens_grid_int_vals and delNL0_rev\n");
+
+    if(dens_grid_int_vals) {
+        for(i = 0; i < HII_TOT_NUM_PIXELS; i++) {
+            SAFE_FREE(dens_grid_int_vals[i]);
+            SAFE_FREE(delNL0_rev[i]);
+        }
+        SAFE_FREE(dens_grid_int_vals);
+        SAFE_FREE(delNL0_rev);
     }
-    free(dens_grid_int_vals);
-    free(delNL0_rev);
 
-    //JBM:
-    for(i=0;i<HII_TOT_NUM_PIXELS;i++) {
-        free(vcb_rev[i]);
+    printf("Freeing vcb_rev\n");
+
+    if(vcb_rev) {
+        for(i = 0; i < HII_TOT_NUM_PIXELS; i++) {
+            SAFE_FREE(vcb_rev[i]);
+        }
+        SAFE_FREE(vcb_rev);
     }
-    free(vcb_rev);
 
+    SAFE_FREE(delNL0_bw);
+    SAFE_FREE(zpp_for_evolve_list);
+    SAFE_FREE(R_values);
+    SAFE_FREE(delNL0_Offset);
+    SAFE_FREE(delNL0_LL);
+    SAFE_FREE(delNL0_UL);
+    SAFE_FREE(SingleVal_int);
+    SAFE_FREE(SingleVal_float);
+    SAFE_FREE(dstarlya_dt_prefactor);
+    SAFE_FREE(delNL0_ibw);
+    SAFE_FREE(log10delNL0_diff);
+    SAFE_FREE(log10delNL0_diff_UL);
 
-    free(delNL0_bw);
-    free(zpp_for_evolve_list);
-    free(R_values);
-    free(delNL0_Offset);
-    free(delNL0_LL);
-    free(delNL0_UL);
-    free(SingleVal_int);
-    free(SingleVal_float);
-    free(dstarlya_dt_prefactor);
-    free(delNL0_ibw);
-    free(log10delNL0_diff);
-    free(log10delNL0_diff_UL);
+    SAFE_FREE(zpp_edge);
+    SAFE_FREE(sigma_atR);
+    SAFE_FREE(sigma_Tmin);
+    SAFE_FREE(ST_over_PS);
+    SAFE_FREE(sum_lyn);
 
-    free(zpp_edge);
-    free(sigma_atR);
-    free(sigma_Tmin);
-    free(ST_over_PS);
-    free(sum_lyn);
+    printf("Freeing freq_int tables\n");
 
-    for(i=0;i<x_int_NXHII;i++) {
-        free(freq_int_heat_tbl[i]);
-        free(freq_int_ion_tbl[i]);
-        free(freq_int_lya_tbl[i]);
-        free(freq_int_heat_tbl_diff[i]);
-        free(freq_int_ion_tbl_diff[i]);
-        free(freq_int_lya_tbl_diff[i]);
+    if(freq_int_heat_tbl) {
+        for(i = 0; i < x_int_NXHII; i++) {
+            SAFE_FREE(freq_int_heat_tbl[i]);
+            SAFE_FREE(freq_int_ion_tbl[i]);
+            SAFE_FREE(freq_int_lya_tbl[i]);
+            SAFE_FREE(freq_int_heat_tbl_diff[i]);
+            SAFE_FREE(freq_int_ion_tbl_diff[i]);
+            SAFE_FREE(freq_int_lya_tbl_diff[i]);
+        }
+        SAFE_FREE(freq_int_heat_tbl);
+        SAFE_FREE(freq_int_ion_tbl);
+        SAFE_FREE(freq_int_lya_tbl);
+        SAFE_FREE(freq_int_heat_tbl_diff);
+        SAFE_FREE(freq_int_ion_tbl_diff);
+        SAFE_FREE(freq_int_lya_tbl_diff);
     }
-    free(freq_int_heat_tbl);
-    free(freq_int_ion_tbl);
-    free(freq_int_lya_tbl);
-    free(freq_int_heat_tbl_diff);
-    free(freq_int_ion_tbl_diff);
-    free(freq_int_lya_tbl_diff);
+
+    printf("Calling free_FcollTable\n");
 
     free_FcollTable();
+
+    printf("Finished destroying arrays\n");
 }
+

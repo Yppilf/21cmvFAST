@@ -59,6 +59,12 @@
 // For default, leave an empty string or "./"
 #define WALKER_FOLDER "/scratch/s4950836/Walker/"
 
+// TS: When having issues with development, I added this function to drive_21cmMC_streamlined to not overwrite files 
+// when already created in a previous run. 
+// Note this function isn't fully implemented yet. If set to 1, default functionality will still apply.
+// Note this does not mean the output isn't calculated(Which would be a useful functionality), only not rewritten to file
+#define OVERWRITE_OUTPUT (0)
+
 
 /* STRUCTURE */
 #define Deltac (1.68) /* at z=0, density excess at virialization */

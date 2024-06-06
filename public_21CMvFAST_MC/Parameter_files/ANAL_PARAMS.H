@@ -257,7 +257,7 @@ Filter for the Halo or density field used to generate ionization field
   0 = don't run the optimization code for zscroll (only useful at low-z)
   1 = do run ...
 */
-#define OPTIMIZE (int) (0)
+#define OPTIMIZE (int) (1)
 /*
   Minimum mass for which the optimization algorithm will be used
 */
