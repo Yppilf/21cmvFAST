@@ -110,13 +110,12 @@ void destroy_21cmMC_TsSaveBoxes_arrays();
 //   } // end loop over remaining j
 // }
 
-
+// Helper macro to safely free memory and set pointer to NULL
+#define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
+#define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
 
 int main(int argc, char ** filenameinput){
-
-
-
-//we start by reading the ini file:
+  //we start by reading the ini file:
 	if(filenameinput[1]==NULL){
 		printf("Error, no input file specified. Use ./smooth_output_box FILENAME \n");
 		return 0;
@@ -143,7 +142,8 @@ int main(int argc, char ** filenameinput){
   box = (float *) calloc(HII_TOT_FFT_NUM_PIXELS,sizeof(float));
   if (!box){
     fprintf(stderr, "Init.c: Error allocating memory for low-res box.\nAborting...\n");
-     free(box);    fftwf_cleanup_threads();
+    SAFE_FREE(box);    
+    fftwf_cleanup_threads();
     free_ps(); return -1;
   }
 
@@ -151,13 +151,15 @@ int main(int argc, char ** filenameinput){
   box2 = (float *) calloc(HII_TOT_FFT_NUM_PIXELS,sizeof(float));
   if (!box2){
     fprintf(stderr, "Init.c: Error allocating memory for low-res box.\nAborting...\n");
-     free(box2);    fftwf_cleanup_threads();
+    SAFE_FREE(box2);    
+    fftwf_cleanup_threads();
     free_ps(); return -1;
   }
   smoothed_box = (float *) malloc(sizeof(float)*HII_TOT_FFT_NUM_PIXELS_smooth);
   if (!smoothed_box){
     fprintf(stderr, "Init.c: Error allocating memory for lower-res smoothed_box.\nAborting...\n");
-    free(smoothed_box);    fftwf_cleanup_threads();
+    SAFE_FREE(smoothed_box);    
+    fftwf_cleanup_threads();
     free_ps(); return -1;
   }
 
@@ -166,7 +168,9 @@ int main(int argc, char ** filenameinput){
   F = fopen(filename, "rb");
   if (!F){
     fprintf(stderr, "Couldn't open file %s for reading\nAborting...\n", filename);
-    free(box);  fclose(F); fftwf_cleanup_threads();
+    SAFE_FREE(box);  
+    fclose(F); 
+    fftwf_cleanup_threads();
     return -1;
   }
 
@@ -177,7 +181,9 @@ int main(int argc, char ** filenameinput){
   // fclose(F);
   if (mod_fread(box, sizeof(float)*HII_TOT_NUM_PIXELS, 1, F)!=1){
     fprintf(stderr, "smooth_output_box.c: Read error occured!\n");
-    free(box);  fclose(F); fftwf_cleanup_threads();
+    SAFE_FREE(box);  
+    fclose(F); 
+    fftwf_cleanup_threads();
     return -1;
   }
 
@@ -198,7 +204,7 @@ for (ct=0; ct<HII_TOT_FFT_NUM_PIXELS; ct++){
    // printf("%e \n",box[ct]);
 }
 //we have to save it in box2 so that box is not erased...
-  free(box2);
+  SAFE_FREE(box2);
 
 
 
@@ -284,18 +290,7 @@ for (ct=0; ct<HII_TOT_FFT_NUM_PIXELS; ct++){
   }
   fclose(F);
 
-
-
-
-  free(box);
-  free(smoothed_box);
-
-
-
-
-
- return 1;
-
-
-
+  SAFE_FREE(box);
+  SAFE_FREE(smoothed_box);
+  return 1;
 }

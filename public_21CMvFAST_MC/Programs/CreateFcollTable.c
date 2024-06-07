@@ -11,6 +11,10 @@ void init_21cmMC_FcollTable_arrays();
 
 void destroy_21cmMC_FcollTable_arrays();
 
+// Helper macro to safely free memory and set pointer to NULL
+#define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
+#define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
+
 int main(int argc, char ** argv){
 
     char filename[500];
@@ -386,11 +390,11 @@ int main(int argc, char ** argv){
     
     for(i=0;i<TOT_NUM_ZPRIME;i++) {
         for(j=0;j<X_RAY_Tvir_POINTS;j++) {
-            free(Fcoll_R_Table[i][j]);
+            SAFE_FREE(Fcoll_R_Table[i][j]);
         }
-        free(Fcoll_R_Table[i]);
+        SAFE_FREE(Fcoll_R_Table[i]);
     }
-    free(Fcoll_R_Table);
+    SAFE_FREE(Fcoll_R_Table);
     
     destroy_21cmMC_FcollTable_arrays();
     
@@ -456,48 +460,48 @@ void destroy_21cmMC_FcollTable_arrays() {
 
     int i,j;
     
-    free(box);
-    free(unfiltered_box);
+    SAFE_FREE(box);
+    SAFE_FREE(unfiltered_box);
     
     for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
         for(j=0;j<zpp_interp_points;j++) {
-            free(fcoll_R_grid[i][j]);
+            SAFE_FREE(fcoll_R_grid[i][j]);
         }
-        free(fcoll_R_grid[i]);
+        SAFE_FREE(fcoll_R_grid[i]);
     }
-    free(fcoll_R_grid);
+    SAFE_FREE(fcoll_R_grid);
     
     for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
-        free(density_gridpoints[i]);
+        SAFE_FREE(density_gridpoints[i]);
     }
-    free(density_gridpoints);
+    SAFE_FREE(density_gridpoints);
     
-    free(ST_over_PS_arg_grid);
-    free(Sigma_Tmin_grid);
+    SAFE_FREE(ST_over_PS_arg_grid);
+    SAFE_FREE(Sigma_Tmin_grid);
     
     for(i=0;i<NUM_FILTER_STEPS_FOR_Ts;i++) {
-        free(fcoll_interp1[i]);
-        free(fcoll_interp2[i]);
-        free(dens_grid_int_vals[i]);
-        free(delNL0[i]);
+        SAFE_FREE(fcoll_interp1[i]);
+        SAFE_FREE(fcoll_interp2[i]);
+        SAFE_FREE(dens_grid_int_vals[i]);
+        SAFE_FREE(delNL0[i]);
     }
-    free(fcoll_interp1);
-    free(fcoll_interp2);
-    free(dens_grid_int_vals);
-    free(delNL0);
+    SAFE_FREE(fcoll_interp1);
+    SAFE_FREE(fcoll_interp2);
+    SAFE_FREE(dens_grid_int_vals);
+    SAFE_FREE(delNL0);
     
-    free(delNL0_bw);
-    free(R_values);
-    free(delNL0_Offset);
-    free(delNL0_LL);
-    free(delNL0_UL);
-    free(SingleVal_int);
-    free(delNL0_ibw);
-    free(log10delNL0_diff);
+    SAFE_FREE(delNL0_bw);
+    SAFE_FREE(R_values);
+    SAFE_FREE(delNL0_Offset);
+    SAFE_FREE(delNL0_LL);
+    SAFE_FREE(delNL0_UL);
+    SAFE_FREE(SingleVal_int);
+    SAFE_FREE(delNL0_ibw);
+    SAFE_FREE(log10delNL0_diff);
 
-    free(zpp_edge);
-    free(sigma_atR);
-    free(sigma_Tmin);
+    SAFE_FREE(zpp_edge);
+    SAFE_FREE(sigma_atR);
+    SAFE_FREE(sigma_Tmin);
     
     free_FcollTable();
 }

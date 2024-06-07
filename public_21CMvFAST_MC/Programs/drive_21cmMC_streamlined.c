@@ -115,6 +115,11 @@ int file_exists(const char *filename) {
     return 0;
 }
 
+// TS: This file had issues with double freeing of memory
+// Helper macro to safely free memory and set pointer to NULL
+#define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
+#define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
+
 int main(int argc, char ** argv){
      fprintf(stderr, "\n----------------------------\nStarting drive_21cmMC_streamlined.c\n----------------------------\n");
 
@@ -645,37 +650,37 @@ int main(int argc, char ** argv){
 
 
     // De-allocate all arrays etc. that have been allocated and used
-    free(Ts_z);
-    free(x_e_z);
+    SAFE_FREE(Ts_z);
+    SAFE_FREE(x_e_z);
 
-    free(PARAM_VALS);
+    SAFE_FREE(PARAM_VALS);
 
-    free(ERFC_VALS);
-    free(ERFC_VALS_DIFF);
+    SAFE_FREE(ERFC_VALS);
+    SAFE_FREE(ERFC_VALS_DIFF);
 
     if(STORE_DATA) {
-        free(aveNF);
-        free(aveTb);
+        SAFE_FREE(aveNF);
+        SAFE_FREE(aveTb);
 
-        free(aveTkin);
-        free(aveTspin_inv);
-        free(aveTkin_inv_sq);
-        free(aveTspin);
-        free(aveXalpha);
+        SAFE_FREE(aveTkin);
+        SAFE_FREE(aveTspin_inv);
+        SAFE_FREE(aveTkin_inv_sq);
+        SAFE_FREE(aveTspin);
+        SAFE_FREE(aveXalpha);
     }
-    free(redshifts);
+    SAFE_FREE(redshifts);
 
-    free(full_index_LC);
-    free(slice_redshifts);
+    SAFE_FREE(full_index_LC);
+    SAFE_FREE(slice_redshifts);
 
     if(USE_LIGHTCONE) {
-        free(box_z1);
-        free(box_z2);
-        free(box_interpolate);
-        free(box_interpolate_remainder);
-        free(redshifts_LC);
-        free(start_index_LC);
-        free(end_index_LC);
+        SAFE_FREE(box_z1);
+        SAFE_FREE(box_z2);
+        SAFE_FREE(box_interpolate);
+        SAFE_FREE(box_interpolate_remainder);
+        SAFE_FREE(redshifts_LC);
+        SAFE_FREE(start_index_LC);
+        SAFE_FREE(end_index_LC);
     }
 
     free_ps();
@@ -683,10 +688,10 @@ int main(int argc, char ** argv){
     if (INHOMO_RECO) {
         free_MHR();
     }
-    fftwf_free(N_rec_unfiltered);
-    fftwf_free(N_rec_filtered);
-    fftwf_free(z_re);
-    fftwf_free(Gamma12);
+    SAFE_FFTWF_FREE(N_rec_unfiltered);
+    SAFE_FFTWF_FREE(N_rec_filtered);
+    SAFE_FFTWF_FREE(z_re);
+    SAFE_FFTWF_FREE(Gamma12);
 
     return 0;
 }
@@ -1625,11 +1630,11 @@ void ComputeTsBoxes() {
     fprintf(stderr, "Start freeing interpolation table memory\n");
     for(i=0;i<Numzp_for_table;i++) {
         for(j=0;j<X_RAY_Tvir_POINTS;j++) {
-            free(Fcoll_R_Table[i][j]);
+            SAFE_FREE(Fcoll_R_Table[i][j]);
         }
-        free(Fcoll_R_Table[i]);
+        SAFE_FREE(Fcoll_R_Table[i]);
     }
-    free(Fcoll_R_Table);
+    SAFE_FREE(Fcoll_R_Table);
 }
 
 void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_REDSHIFT) {
@@ -2844,7 +2849,7 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
         }
         fclose(F);
 
-        free(smoothed_box_vcb);
+        SAFE_FREE(smoothed_box_vcb);
 
     }//JBM:continue the rest of the code:
 
@@ -3103,8 +3108,8 @@ void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_
     //////////////////////////// End of perform 'delta_T.c' /////////////////////////////////////
     }
 
-    free(LOS_index);
-    free(slice_index);
+    SAFE_FREE(LOS_index);
+    SAFE_FREE(slice_index);
 
     destroy_21cmMC_HII_arrays(skip_deallocate);
 }
@@ -3504,7 +3509,7 @@ void ComputeInitialConditions() {
         // deallocate the supplementary boxes
         for(i = 0; i < 3; ++i){
             for(j = 0; j <= i; ++j){
-                fftwf_free(phi_1[PHI_INDEX(i,j)]);
+                SAFE_FFTWF_FREE(phi_1[PHI_INDEX(i,j)]);
             }
         }
     }
@@ -3513,8 +3518,8 @@ void ComputeInitialConditions() {
      * *********************************************** */
 
     // deallocate
-    fftwf_free(HIRES_box);
-    fftwf_free(HIRES_box_saved);
+    SAFE_FFTWF_FREE(HIRES_box);
+    SAFE_FFTWF_FREE(HIRES_box_saved);
 }
 
 /*****  Adjust the complex conjugate relations for a real array  *****/
@@ -3839,8 +3844,8 @@ void ComputePerturbField(float REDSHIFT_SAMPLE) {
     }
 
     // deallocate
-    fftwf_free(LOWRES_density_perturb);
-    fftwf_free(LOWRES_density_perturb_saved);
+    SAFE_FFTWF_FREE(LOWRES_density_perturb);
+    SAFE_FFTWF_FREE(LOWRES_density_perturb_saved);
 }
 
 
@@ -4347,21 +4352,21 @@ void GeneratePS_aniso(int CO_EVAL, double AverageTb, char* filename) {
 
 
     for(i=0;i<NUM_BINS;i++) {
-        free(pow21[i]);
+        SAFE_FREE(pow21[i]);
     }
-    free(pow21);
+    SAFE_FREE(pow21);
     for(i=0;i<NUM_BINS;i++) {
-        free(counter_kmu[i]);
+        SAFE_FREE(counter_kmu[i]);
     }
-    free(counter_kmu);
+    SAFE_FREE(counter_kmu);
     for(i=0;i<NUM_BINS;i++) {
-        free(k_avg[i]);
+        SAFE_FREE(k_avg[i]);
     }
-    free(k_avg);
+    SAFE_FREE(k_avg);
     for(i=0;i<NUM_BINS;i++) {
-        free(mu_k_avg[i]);
+        SAFE_FREE(mu_k_avg[i]);
     }
-    free(mu_k_avg);
+    SAFE_FREE(mu_k_avg);
 
 
 
@@ -4639,56 +4644,51 @@ void init_21cmMC_HII_arrays() {
 // }
 
 void destroy_21cmMC_HII_arrays(int skip_deallocate) {
+    SAFE_FFTWF_FREE(deltax_unfiltered);
+    SAFE_FFTWF_FREE(deltax_unfiltered_original);
+    SAFE_FFTWF_FREE(deltax_filtered);
+    SAFE_FFTWF_FREE(deldel_T);
+    SAFE_FFTWF_FREE(deldel_T_LC);
+    SAFE_FFTWF_FREE(xe_unfiltered);
+    SAFE_FFTWF_FREE(xe_filtered);
 
-    fftwf_free(deltax_unfiltered);
-    fftwf_free(deltax_unfiltered_original);
-    fftwf_free(deltax_filtered);
-    fftwf_free(deldel_T);
-    fftwf_free(deldel_T_LC);
-    fftwf_free(xe_unfiltered);
-    fftwf_free(xe_filtered);
+    SAFE_FREE(xH);
+    SAFE_FREE(deltax);
+    SAFE_FREE(Fcoll);
+    SAFE_FREE(delta_T);
+    SAFE_FREE(v);
+    SAFE_FREE(vel_gradient);
+    SAFE_FREE(p_box);
+    SAFE_FREE(k_ave);
+    SAFE_FREE(in_bin_ct);
 
-    free(xH);
-    free(deltax);
-    free(Fcoll);
-    free(delta_T);
-    free(v);
-    free(vel_gradient);
-    free(p_box);
-    free(k_ave);
-    free(in_bin_ct);
+    SAFE_FREE(x_pos);
+    SAFE_FREE(x_pos_offset);
+    SAFE_FREE(delta_T_RSD_LOS);
 
-    free(x_pos);
-    free(x_pos_offset);
-    free(delta_T_RSD_LOS);
+    SAFE_FREE(Overdense_spline_GL_low);
+    SAFE_FREE(Fcoll_spline_GL_low);
+    SAFE_FREE(second_derivs_low_GL);
+    SAFE_FREE(Overdense_spline_GL_high);
+    SAFE_FREE(Fcoll_spline_GL_high);
+    SAFE_FREE(second_derivs_high_GL);
 
-    free(Overdense_spline_GL_low);
-    free(Fcoll_spline_GL_low);
-    free(second_derivs_low_GL);
-    free(Overdense_spline_GL_high);
-    free(Fcoll_spline_GL_high);
-    free(second_derivs_high_GL);
+    SAFE_FREE(xi_low);
+    SAFE_FREE(wi_low);
 
-    free(xi_low);
-    free(wi_low);
-
-    free(xi_high);
-    free(wi_high);
+    SAFE_FREE(xi_high);
+    SAFE_FREE(wi_high);
 
     if(skip_deallocate!=1) {
-        free(Mass_Spline);
-        free(Sigma_Spline);
-        free(dSigmadm_Spline);
-        free(second_derivs_sigma);
-        free(second_derivs_dsigma);
+        SAFE_FREE(Mass_Spline);
+        SAFE_FREE(Sigma_Spline);
+        SAFE_FREE(dSigmadm_Spline);
+        SAFE_FREE(second_derivs_sigma);
+        SAFE_FREE(second_derivs_dsigma);
     }
 }
 
 void destroy_21cmMC_Ts_arrays() {
-    // Helper macro to safely free memory and set pointer to NULL
-    #define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
-    #define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
-
     int i, j;
 
     printf("Freeing box and related pointers\n");

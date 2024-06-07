@@ -205,15 +205,15 @@ int main (int argc, char ** argv){
     }
     for (i=0; i<HII_DIM; i++){
       for (j=0; j<HII_DIM; j++){
-	for (k=0; k<HII_DIM; k++){
-	  if (fread(((float *)updated + HII_R_FFT_INDEX(i,j,k)), sizeof(float), 1, F) != 1){
-	    fprintf(stderr, "perturb_field.c: Error reading file %s.\nAborting\n", filename);
-	    fftwf_free(updated); fclose(F); fftwf_free(vx);
-	    free_ps(); return -1;
-	  }
+        for (k=0; k<HII_DIM; k++){
+          if (fread(((float *)updated + HII_R_FFT_INDEX(i,j,k)), sizeof(float), 1, F) != 1){
+            fprintf(stderr, "perturb_field.c: Error reading file %s.\nAborting\n", filename);
+            fftwf_free(updated); fclose(F); fftwf_free(vx);
+            free_ps(); return -1;
+          }
 
-	  *((float *)updated + HII_R_FFT_INDEX(i,j,k)) *= growth_factor;
-	}
+          *((float *)updated + HII_R_FFT_INDEX(i,j,k)) *= growth_factor;
+        }
       }
     }
     fclose(F);
@@ -381,65 +381,64 @@ int main (int argc, char ** argv){
     // go through the high-res box, mapping the mass onto the low-res (updated) box
     for (i=0; i<DIM;i++){
       for (j=0; j<DIM;j++){
-	for (k=0; k<DIM;k++){
+	      for (k=0; k<DIM;k++){
 
-	  // map indeces to locations in units of box size
-	  xf = (i+0.5)/(DIM+0.0);
-	  yf = (j+0.5)/(DIM+0.0);
-	  zf = (k+0.5)/(DIM+0.0);
+          // map indices to locations in units of box size
+          xf = (i+0.5)/(DIM+0.0);
+          yf = (j+0.5)/(DIM+0.0);
+          zf = (k+0.5)/(DIM+0.0);
 
-	  // update locations
-	  HII_i = (unsigned long long)(i/f_pixel_factor);
-	  HII_j = (unsigned long long)(j/f_pixel_factor);
-	  HII_k = (unsigned long long)(k/f_pixel_factor);
-	  xf += vx[HII_R_INDEX(HII_i, HII_j, HII_k)];
-	  yf += vy[HII_R_INDEX(HII_i, HII_j, HII_k)];
-	  zf += vz[HII_R_INDEX(HII_i, HII_j, HII_k)];
+          // update locations
+          HII_i = (unsigned long long)(i/f_pixel_factor);
+          HII_j = (unsigned long long)(j/f_pixel_factor);
+          HII_k = (unsigned long long)(k/f_pixel_factor);
+          xf += vx[HII_R_INDEX(HII_i, HII_j, HII_k)];
+          yf += vy[HII_R_INDEX(HII_i, HII_j, HII_k)];
+          zf += vz[HII_R_INDEX(HII_i, HII_j, HII_k)];
 
 
-    // 2LPT PART
-    // add second order corrections
-    if(SECOND_ORDER_LPT_CORRECTIONS){
-      xf -= vx_2LPT[HII_R_INDEX(HII_i,HII_j,HII_k)];
-      yf -= vy_2LPT[HII_R_INDEX(HII_i,HII_j,HII_k)];
-      zf -= vz_2LPT[HII_R_INDEX(HII_i,HII_j,HII_k)];
-    }
+          // 2LPT PART
+          // add second order corrections
+          if(SECOND_ORDER_LPT_CORRECTIONS){
+            xf -= vx_2LPT[HII_R_INDEX(HII_i,HII_j,HII_k)];
+            yf -= vy_2LPT[HII_R_INDEX(HII_i,HII_j,HII_k)];
+            zf -= vz_2LPT[HII_R_INDEX(HII_i,HII_j,HII_k)];
+          }
 
-	  xf *= HII_DIM;
-	  yf *= HII_DIM;
-	  zf *= HII_DIM;
-	  while (xf >= (float)HII_DIM){ xf -= HII_DIM;}
-	  while (xf < 0){ xf += HII_DIM;}
-	  while (yf >= (float)HII_DIM){ yf -= HII_DIM;}
-	  while (yf < 0){ yf += HII_DIM;}
-	  while (zf >= (float)HII_DIM){ zf -= HII_DIM;}
-	  while (zf < 0){ zf += HII_DIM;}
-	  xi = xf;
-	  yi = yf;
-	  zi = zf;
-	  if (xi >= HII_DIM){ xi -= HII_DIM;}
-	  if (xi < 0) {xi += HII_DIM;}
-	  if (yi >= HII_DIM){ yi -= HII_DIM;}
-	  if (yi < 0) {yi += HII_DIM;}
-	  if (zi >= HII_DIM){ zi -= HII_DIM;}
-	  if (zi < 0) {zi += HII_DIM;}
+          xf *= HII_DIM;
+          yf *= HII_DIM;
+          zf *= HII_DIM;
+          while (xf >= (float)HII_DIM){ xf -= HII_DIM;}
+          while (xf < 0){ xf += HII_DIM;}
+          while (yf >= (float)HII_DIM){ yf -= HII_DIM;}
+          while (yf < 0){ yf += HII_DIM;}
+          while (zf >= (float)HII_DIM){ zf -= HII_DIM;}
+          while (zf < 0){ zf += HII_DIM;}
+          xi = xf;
+          yi = yf;
+          zi = zf;
+          if (xi >= HII_DIM){ xi -= HII_DIM;}
+          if (xi < 0) {xi += HII_DIM;}
+          if (yi >= HII_DIM){ yi -= HII_DIM;}
+          if (yi < 0) {yi += HII_DIM;}
+          if (zi >= HII_DIM){ zi -= HII_DIM;}
+          if (zi < 0) {zi += HII_DIM;}
         
-	  // now move the mass
-	  *( (float *)updated + HII_R_FFT_INDEX(xi, yi, zi) ) +=
-	    (1 + init_growth_factor*deltax[R_FFT_INDEX(i,j,k)]);
-	}
+          // now move the mass
+          *( (float *)updated + HII_R_FFT_INDEX(xi, yi, zi) ) += (1 + init_growth_factor*deltax[R_FFT_INDEX(i,j,k)]);
+        }
       }
     }
 
     // renormalize to the new pixel size, and make into delta
-    //    ave_delta = 0;
+    // ave_delta = 0;
     for (i=0; i<HII_DIM; i++){
       for (j=0; j<HII_DIM; j++){
-	for (k=0; k<HII_DIM; k++){
-	  *((float *)updated + HII_R_FFT_INDEX(i,j,k) ) /= mass_factor;
-	  *((float *)updated + HII_R_FFT_INDEX(i,j,k) ) -= 1;
-	  //  ave_delta += *((float *)updated + HII_R_FFT_INDEX(i,j,k) );
-	}
+	      for (k=0; k<HII_DIM; k++){
+	        *((float *)updated + HII_R_FFT_INDEX(i,j,k) ) /= mass_factor;
+	        *((float *)updated + HII_R_FFT_INDEX(i,j,k) ) -= 1;
+	        //  ave_delta += *((float *)updated + HII_R_FFT_INDEX(i,j,k) );
+	      }
       }
     }
     //    ave_delta /= (double)HII_TOT_NUM_PIXELS;
@@ -494,11 +493,11 @@ int main (int argc, char ** argv){
     // normalize after FFT
     for(i=0; i<HII_DIM; i++){
       for(j=0; j<HII_DIM; j++){
-	for(k=0; k<HII_DIM; k++){
-	  *((float *)updated + HII_R_FFT_INDEX(i,j,k)) /= (float)HII_TOT_NUM_PIXELS;
-	  if (*((float *)updated + HII_R_FFT_INDEX(i,j,k)) < -1) // shouldn't happen
-	    *((float *)updated + HII_R_FFT_INDEX(i,j,k)) = -1+FRACT_FLOAT_ERR;
-	}
+        for(k=0; k<HII_DIM; k++){
+          *((float *)updated + HII_R_FFT_INDEX(i,j,k)) /= (float)HII_TOT_NUM_PIXELS;
+          if (*((float *)updated + HII_R_FFT_INDEX(i,j,k)) < -1) // shouldn't happen
+            *((float *)updated + HII_R_FFT_INDEX(i,j,k)) = -1+FRACT_FLOAT_ERR;
+        }
       }
     }
       

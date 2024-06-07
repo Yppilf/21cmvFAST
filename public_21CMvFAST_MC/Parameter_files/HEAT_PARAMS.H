@@ -142,6 +142,6 @@ Filter choice used for smoothing the linear density field to obtain the collapse
   Flag to turn off or on verbose status messages in Ts.  The GSL libraries are very finicky,
   and this is useful when to help issolate why Ts crashed, if it did...
  */
-#define DEBUG_ON (int) 1
+#define DEBUG_ON (int) 0
 
 #endif

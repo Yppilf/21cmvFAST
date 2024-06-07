@@ -2,6 +2,10 @@
 #include "../Parameter_files/ANAL_PARAMS.H"
 #include "../Parameter_files/Variables.h"
 
+// Helper macro to safely free memory and set pointer to NULL
+#define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
+#define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
+
 int main(int argc, char ** argv){
 
     char filename[500];
@@ -61,8 +65,8 @@ int main(int argc, char ** argv){
     fprintf(F, "%lf\n",taue);
     fclose(F);
     
-    free(Redshifts);
-    free(xH);
+    SAFE_FREE(Redshifts);
+    SAFE_FREE(xH);
     
     return 0;
 }

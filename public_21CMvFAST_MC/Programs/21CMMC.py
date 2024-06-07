@@ -61,7 +61,7 @@ if __name__ == '__main__':
 	IncludeLightCone = True
 
 	# Use an interpolation table for the full box collapsed fraction for the computation of the IGM spin temperature. 
-	UseFcollTable = False
+	UseFcollTable = True
 	# The full Ts.c calculation can be ~20% faster if an Interpolation table for the collapsed fraction is used. This collapsed fraction is
 	# averaged across the full box (necessary for Ts.c) as a function of the minimum halo mass for the full range set for this parameter below.
 	# This table can be created by calling CreateFcollTable from the command line, and providing the necessary arguments (See CreateFcollTable.c for further details).
@@ -78,7 +78,7 @@ if __name__ == '__main__':
 	# is sufficiently high to obtain sufficiently high accuracy results
 
 	# Use an interpolation table for the full box as a function of smoothing radius for the computation of the IGM neutral fraction (find_HII_bubbles part of the code)
-	USE_IONISATION_FCOLL_TABLE = False	
+	USE_IONISATION_FCOLL_TABLE = True	
 	# This is generated using 'Create_ionisaton_fcoll_tables.py'. What this does is compute the averaged collapsed fraction for each light-cone redshift, as a function
 	# of smoothing radius and Tvir_min. Setting this flag can boost code efficiency by ~15-20%. This must be generated for the same upper limit for the mean free path
 	# (i.e. UpperBound_MFP) and for the same lower and upper limits for the virial temperature of the haloes (X_RAY_TVIR_LB and	X_RAY_TVIR_UB)

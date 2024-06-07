@@ -126,7 +126,14 @@ int main(int argc, char ** argv){
     fprintf(stderr, "init: kmax < 1 Mpc-1, so not all the power in v_cb will be included, change DIM to be larger \n.");
   }
 
-
+  // TS: Copy initial Walker files to WALKER_FOLDER
+  char command[100];
+  sprintf(command, "mkdir %s", WALKER_FOLDER);
+  system(command);
+  sprintf(command, "cp Walker_1.000000_1.000000.txt %s", WALKER_FOLDER);
+  system(command);
+  sprintf(command, "cp WalkerCosmology_1.000000_1.000000.txt %s", WALKER_FOLDER);
+  system(command);
 
     /****** Modifications to allow the cosmology and random seed to be obtained from file *****/
 
@@ -163,11 +170,7 @@ int main(int argc, char ** argv){
   init_ps();
   //JBM:We have added an initializer to the CLASS interpolator inside init_ps().
 
-  char command[100];
   sprintf(command, "mkdir %s", BOXES_INPUT_FOLDER);
-  system(command);
-
-  sprintf(command, "mkdir %s", WALKER_FOLDER);
   system(command);
 
   // initialize and allocate thread info

@@ -176,8 +176,9 @@ int init_FcollTable(float zmin, float zmax)
 
 void free_FcollTable()
 {
+    #define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
     FgtrM_1DTable_linear = NULL;
-    free(FgtrM_1DTable_linear);
+    SAFE_FREE(FgtrM_1DTable_linear);
 }
 
 

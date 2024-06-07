@@ -15,6 +15,10 @@ float REDSHIFT;
 void init_21cmMC_HII_arrays();
 void destroy_21cmMC_HII_arrays();
 
+// Helper macro to safely free memory and set pointer to NULL
+#define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
+#define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
+
 int main(int argc, char ** argv){
     
     omp_set_num_threads(1);
@@ -321,10 +325,10 @@ int main(int argc, char ** argv){
     
     destroy_21cmMC_HII_arrays(skip_deallocate);
     
-    free(ERFC_VALS);
-    free(ERFC_VALS_DIFF);
+    SAFE_FREE(ERFC_VALS);
+    SAFE_FREE(ERFC_VALS_DIFF);
     
-    free(redshifts);
+    SAFE_FREE(redshifts);
     
     return 0;
 }
@@ -384,40 +388,40 @@ void init_21cmMC_HII_arrays() {
 
 void destroy_21cmMC_HII_arrays(int skip_deallocate) {
     
-    fftwf_free(deltax_unfiltered);
-    fftwf_free(deltax_unfiltered_original);
-    fftwf_free(deltax_filtered);
-    fftwf_free(deldel_T);
-    fftwf_free(xe_unfiltered);
-    fftwf_free(xe_filtered);
+    SAFE_FFTWF_FREE(deltax_unfiltered);
+    SAFE_FFTWF_FREE(deltax_unfiltered_original);
+    SAFE_FFTWF_FREE(deltax_filtered);
+    SAFE_FFTWF_FREE(deldel_T);
+    SAFE_FFTWF_FREE(xe_unfiltered);
+    SAFE_FFTWF_FREE(xe_filtered);
     
-    free(xH);
-    free(deltax);
-    free(Fcoll);
-    free(delta_T);
-    free(v);
-    free(p_box);
-    free(k_ave);
-    free(in_bin_ct);
+    SAFE_FREE(xH);
+    SAFE_FREE(deltax);
+    SAFE_FREE(Fcoll);
+    SAFE_FREE(delta_T);
+    SAFE_FREE(v);
+    SAFE_FREE(p_box);
+    SAFE_FREE(k_ave);
+    SAFE_FREE(in_bin_ct);
     
-    free(Overdense_spline_GL_low);
-    free(Fcoll_spline_GL_low);
-    free(second_derivs_low_GL);
-    free(Overdense_spline_GL_high);
-    free(Fcoll_spline_GL_high);
-    free(second_derivs_high_GL);
+    SAFE_FREE(Overdense_spline_GL_low);
+    SAFE_FREE(Fcoll_spline_GL_low);
+    SAFE_FREE(second_derivs_low_GL);
+    SAFE_FREE(Overdense_spline_GL_high);
+    SAFE_FREE(Fcoll_spline_GL_high);
+    SAFE_FREE(second_derivs_high_GL);
 
-    free(xi_low);
-    free(wi_low);
+    SAFE_FREE(xi_low);
+    SAFE_FREE(wi_low);
     
-    free(xi_high);
-    free(wi_high);
+    SAFE_FREE(xi_high);
+    SAFE_FREE(wi_high);
     
     if(skip_deallocate!=1) {
-        free(Mass_Spline);
-        free(Sigma_Spline);
-        free(dSigmadm_Spline);
-        free(second_derivs_sigma);
-        free(second_derivs_dsigma);
+        SAFE_FREE(Mass_Spline);
+        SAFE_FREE(Sigma_Spline);
+        SAFE_FREE(dSigmadm_Spline);
+        SAFE_FREE(second_derivs_sigma);
+        SAFE_FREE(second_derivs_dsigma);
     }
 }

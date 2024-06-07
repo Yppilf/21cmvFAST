@@ -10,6 +10,10 @@ float REDSHIFT;
 
 #define TOTAL_COSMOLOGY_FILEPARAMS (int)7
 
+// Helper macro to safely free memory and set pointer to NULL
+#define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
+#define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
+
 int main(int argc, char ** argv){
     
     omp_set_num_threads(1);
@@ -185,16 +189,15 @@ int main(int argc, char ** argv){
         z_prime = ((1.+prev_z_prime) / ZPRIME_STEP_FACTOR - 1.);
     }
 
-    fftwf_free(deltax_unfiltered);
-    fftwf_free(deltax_filtered);
+    SAFE_FFTWF_FREE(deltax_unfiltered);
+    SAFE_FFTWF_FREE(deltax_filtered);
     
-    free(PARAM_COSMOLOGY_VALS);
+    SAFE_FREE(PARAM_COSMOLOGY_VALS);
     
     for(i=0;i<N_RSTEPS;i++) {
-        free(stored_smoothed_density[i]);
+        SAFE_FREE(stored_smoothed_density[i]);
     }
-    free(stored_smoothed_density);
+    SAFE_FREE(stored_smoothed_density);
 
-    
     return 0;
 }

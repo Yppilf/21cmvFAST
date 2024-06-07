@@ -8,6 +8,10 @@
   Author:  Andrei Mesinger
 */
 
+// Helper macro to safely free memory and set pointer to NULL
+#define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
+#define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
+
 int main(int argc, char ** argv){
   fftwf_complex *box, *smoothed_box;
   fftwf_plan plan;
@@ -40,7 +44,7 @@ int main(int argc, char ** argv){
   F=fopen(argv[2], "rb");
   if (!F){
     fprintf(stderr, "smooth_field.c: Error open binary file %s for reading\nAborting...\n", argv[2]);
-    fftwf_free(box);
+    SAFE_FFTWF_FREE(box);
     return -1;
   }
   if (format==0){ // box has no fft padding
@@ -49,7 +53,7 @@ int main(int argc, char ** argv){
 	for (k=0; k<DIM; k++){
 	  if (fread((float *)box + R_FFT_INDEX(i,j,k), sizeof(float), 1, F)!=1){
 	    fprintf(stderr, "smooth_field.c: Error reading-in binary file %s\nAborting...\n", argv[2]);
-	    fftwf_free(box), fclose(F);
+	    SAFE_FFTWF_FREE(box), fclose(F);
 	    return -1;
 	  }
 	}
@@ -59,13 +63,13 @@ int main(int argc, char ** argv){
   else if (format==1){ // box has fft padding
     if (mod_fread(box, sizeof(fftwf_complex)*KSPACE_NUM_PIXELS, 1, F)!=1){
       fprintf(stderr, "smooth_field.c: Error reading-in binary file %s\nAborting...\n", argv[2]);
-      fftwf_free(box), fclose(F);
+      SAFE_FFTWF_FREE(box), fclose(F);
       return -1;
     }
   }
   else{
     fprintf(stderr, "smooth_field.c: Incorrect format specifier %i\nAborting...\n", format);
-    fftwf_free(box), fclose(F);
+    SAFE_FFTWF_FREE(box), fclose(F);
     return -1;
   }
   fclose(F);
@@ -87,7 +91,7 @@ int main(int argc, char ** argv){
   F=fopen(argv[3], "wb");
   if (!F){
     fprintf(stderr, "smooth_field.c: Error open binary file %s for writting\nAborting...\n", argv[3]);
-    fftwf_free(box);
+    SAFE_FFTWF_FREE(box);
     return -1;
   }
   if (format==0){ // no fft padding
@@ -96,7 +100,7 @@ int main(int argc, char ** argv){
 	for (k=0; k<HII_DIM; k++){
 	  if( fwrite( (float *)smoothed_box + HII_R_FFT_INDEX(i,j,k), sizeof(float), 1, F)!=1){
 	    fprintf(stderr, "smooth_field.c: Error writting binary file %s\nAborting...\n", argv[3]);
-	    fftwf_free(box), fclose(F);
+	    SAFE_FFTWF_FREE(box), fclose(F);
 	    return -1;
 	  }
 	}
@@ -109,6 +113,6 @@ int main(int argc, char ** argv){
    }
   }
 
-   fftwf_free(smoothed_box); fftwf_free(box), fclose(F);
+   SAFE_FFTWF_FREE(smoothed_box); SAFE_FFTWF_FREE(box), fclose(F);
   return 0;
 }
