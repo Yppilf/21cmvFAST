@@ -50,6 +50,7 @@ void init_21cmMC_TsSaveBoxes_arrays();
 
 void ComputeBoxesForFile();
 void ComputeTsBoxes();
+void free_TS_memory(); // Added this to avoid double free errors until after the data is obtained
 void ComputeIonisationBoxes(int sample_index, float REDSHIFT_SAMPLE, float PREV_REDSHIFT);
 
 void adj_complex_conj();
@@ -120,6 +121,7 @@ int file_exists(const char *filename) {
 #define SAFE_FREE(ptr) if(ptr) { free(ptr); ptr = NULL; }
 #define SAFE_FFTWF_FREE(ptr) if(ptr) { fftwf_free(ptr); ptr = NULL; }
 
+// TS: Note unsure if memory is properly freed
 int main(int argc, char ** argv){
      fprintf(stderr, "\n----------------------------\nStarting drive_21cmMC_streamlined.c\n----------------------------\n");
 
@@ -605,8 +607,6 @@ int main(int argc, char ** argv){
         }
     }
 
-
-
     fprintf(stderr, "Storing data: %d\n", STORE_DATA);
     // Storing the global history of the IGM neutral fraction and brightness temperature contrast into a text-file
     if(STORE_DATA) {
@@ -647,7 +647,7 @@ int main(int argc, char ** argv){
     }
 
 
-
+    free_TS_memory();
 
     // De-allocate all arrays etc. that have been allocated and used
     SAFE_FREE(Ts_z);
@@ -1621,12 +1621,28 @@ void ComputeTsBoxes() {
             counter += 1;
         } // end main integral loop over z'
 
-        fprintf(stderr, "Start freeing Ts memory\n");
-        destroy_21cmMC_Ts_arrays();
-        fprintf(stderr, "Freed Ts arrays, Starting destruct_heat()\n");
-        destruct_heat();
+        // 
+        // fprintf(stderr, "Start freeing Ts memory\n");
+        // destroy_21cmMC_Ts_arrays();
+        // fprintf(stderr, "Freed Ts arrays, Starting destruct_heat()\n");
+        // destruct_heat();
     }
 
+    // fprintf(stderr, "Start freeing interpolation table memory\n");
+    // for(i=0;i<Numzp_for_table;i++) {
+    //     for(j=0;j<X_RAY_Tvir_POINTS;j++) {
+    //         SAFE_FREE(Fcoll_R_Table[i][j]);
+    //     }
+    //     SAFE_FREE(Fcoll_R_Table[i]);
+    // }
+    // SAFE_FREE(Fcoll_R_Table);
+}
+
+void free_TS_memory() {
+    fprintf(stderr, "Start freeing Ts memory\n");
+    destroy_21cmMC_Ts_arrays();
+    fprintf(stderr, "Freed Ts arrays, Starting destruct_heat()\n");
+    destruct_heat();
     fprintf(stderr, "Start freeing interpolation table memory\n");
     for(i=0;i<Numzp_for_table;i++) {
         for(j=0;j<X_RAY_Tvir_POINTS;j++) {
