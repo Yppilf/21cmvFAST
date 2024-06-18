@@ -1,10 +1,10 @@
-2024-05-28 19:27:27,660 INFO:Using CosmoHammer 0.2.1
-2024-05-28 19:27:27,660 INFO:Using emcee 1.2.0
-2024-05-28 19:27:27,665 INFO:Sampler: <class 'CosmoHammer_21CMMC.sampler.CosmoHammerSampler.CosmoHammerSampler'>
+2024-06-18 09:31:15,446 INFO:Using CosmoHammer 0.2.1
+2024-06-18 09:31:15,446 INFO:Using emcee 1.2.0
+2024-06-18 09:31:15,531 INFO:Sampler: <class 'CosmoHammer_21CMMC.sampler.CosmoHammerSampler.CosmoHammerSampler'>
 configuration: 
-  Burnin iterations: 1
-  Samples iterations: 1
-  Walkers ratio: 2
+  Burnin iterations: 250
+  Samples iterations: 3000
+  Walkers ratio: 16
   Reusing burn in: False
   init pos generator: SampleBallPositionGenerator
   stop criteria: IterationStopCriteriaStrategy
@@ -15,4 +15,4 @@ Core Modules:
 Likelihood Modules: 
   Likelihood21cmFast_multiz
 
-2024-05-28 19:27:27,665 INFO:start burn in
+2024-06-18 09:31:15,532 INFO:start burn in

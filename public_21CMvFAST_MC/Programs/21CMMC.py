@@ -53,7 +53,7 @@ if __name__ == '__main__':
 	Include_Ts_fluc = True
 
 	# If the full spin temperature computation is to be performed, a redshift must be provided to which to perform the evolution down to.
-	TsCalc_z = 16.1
+	TsCalc_z = 6
 
 	# Decide whether to use light-cone boxes or co-eval boxes
 	# Note that the light-cone can only be generated along the z-direction (21cmFAST could do any arbitrary direction, this only does the z-direction). Should be 
@@ -135,6 +135,18 @@ if __name__ == '__main__':
 	# Separating the accepted/rejected points from the MCMC output can be done in post-processing (a separate script is provided to do so "ReadAllData.py"). 
 	# It was a bit too unwieldly to do internally, so I opted for externally dealing with separating the data.
 	KEEP_ALL_DATA = True
+
+	# If True, the data in the likelihood module will be copied instead of moved. If False, original functionality is kept
+	COPY_DATA_LIKELIHOOD = True
+
+	# Whether to use a given set of IDs or to generate new ones.
+	# Setting this to true will look for the walker files in the corresponding folder and for the output in the output folder
+	# False will retain the original functionality. The id's specified below won't be used
+	# NOTE if IncludeLightCone is False, the CO_EVAL_Z will still not be read. So do not use this functionality if that is the case, it won't work
+	# NOTE make sure the settings correspond to the data, there are no checks in place
+	USE_EXISTING_DATA = True
+	USE_EXISTING_DATA_id1 = 1.0
+	USE_EXISTING_DATA_id2 = 1.0
 
 
 
@@ -862,7 +874,7 @@ if __name__ == '__main__':
 	
 	Likelihoodmodel21cmFast = Likelihood21cmFast_multiz(multi_z_mockobs_k,multi_z_mockobs_PS,multi_z_Error_k,multi_z_Error_PS,
 			Redshift,Redshifts_For_Prior,param_legend,Fiducial_Params,FlagOptions,param_string_names,NSplinePoints,TsCalc_z,foreground_cut,shot_noise_cut,IncludeLightCone,
-			ModUncert,PriorLegend,NFVals_QSODamping,PDFVals_QSODamping, output_folder_location, walker_folder_location)	
+			ModUncert,PriorLegend,NFVals_QSODamping,PDFVals_QSODamping, output_folder_location, walker_folder_location, USE_EXISTING_DATA, USE_EXISTING_DATA_id1, USE_EXISTING_DATA_id2, COPY_DATA_LIKELIHOOD)	
 
 	chain.addLikelihoodModule(Likelihoodmodel21cmFast)
 
@@ -874,16 +886,16 @@ if __name__ == '__main__':
                     params = params,
                     likelihoodComputationChain=chain,
                     filePrefix="%s"%(File_String),
-                    walkersRatio=2,
+                    walkersRatio=16,
                     FiducialParams=Fiducial_Params,
                     param_legend=param_legend,
                     LowerBound_XRAY=X_RAY_TVIR_LB,
                     UpperBound_XRAY=X_RAY_TVIR_UB,
                     SpinTz=TsCalc_z,
-                    burninIterations=1,
-                    sampleIterations=1,
+                    burninIterations=250,
+                    sampleIterations=3000,
                     filethin = 1,
-                    threadCount=1,
+                    threadCount=24,
 	                reuseBurnin=False
 	           	)
 

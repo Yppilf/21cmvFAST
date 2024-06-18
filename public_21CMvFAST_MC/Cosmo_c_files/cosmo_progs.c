@@ -508,6 +508,7 @@ double tau_e(float zstart, float zend, float *zarry, float *xHarry, int len){
   gsl_integration_workspace * w 
     = gsl_integration_workspace_alloc (1000);
   tau_e_params p;
+  // fprintf(stderr, "Starting tau_e\n");
 
   if (zstart >= zend){
     fprintf(stderr, "Error in function taue! First parameter must be smaller than the second.\n");
@@ -521,6 +522,8 @@ double tau_e(float zstart, float zend, float *zarry, float *xHarry, int len){
   F.params = &p;
   if ((len > 0) && zarry)
     zend = zarry[len-1] - FRACT_FLOAT_ERR;
+
+  // fprintf(stderr, "Allocated variables\n");
 
   if (zend > Zreion_HeII){// && (zstart < Zreion_HeII)){
       if (zstart < Zreion_HeII){
@@ -541,6 +544,8 @@ double tau_e(float zstart, float zend, float *zarry, float *xHarry, int len){
 			 1000, GSL_INTEG_GAUSS61, w, &prehelium, &error); 
   }
   gsl_integration_workspace_free (w);
+
+  // fprintf(stderr, "Performed integration\n");
 
   return SIGMAT * ( (N_b0+He_No)*prehelium + N_b0*posthelium );
 }

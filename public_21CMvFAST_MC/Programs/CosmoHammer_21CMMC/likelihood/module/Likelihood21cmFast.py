@@ -10,6 +10,7 @@ import string
 import subprocess
 import time
 import multiprocessing
+import re
 
 TWOPLACES = Decimal(10) ** -2       # same as Decimal('0.01')
 FOURPLACES = Decimal(10) ** -4       # same as Decimal('0.0001')
@@ -23,7 +24,8 @@ QSO_Redshift = 7.0842
 class Likelihood21cmFast_multiz(object):
     
     def __init__(self, k_values, PS_values, Error_k_values, PS_Error, Redshift, Redshifts_For_Prior, param_legend, Fiducial_Params, FlagOptions, param_string_names, NSplinePoints, 
-                        TsCalc_z, Foreground_cut, Shot_Noise_cut, IncludeLightCone, ModUncert, PriorLegend, NFValsQSO, PDFValsQSO, output_folder_location, walker_folder_location):
+                        TsCalc_z, Foreground_cut, Shot_Noise_cut, IncludeLightCone, ModUncert, PriorLegend, NFValsQSO, PDFValsQSO, output_folder_location, walker_folder_location, 
+                        USE_EXISTING_DATA, USE_EXISTING_DATA_id1, USE_EXISTING_DATA_id2, COPY_DATA):
         self.k_values = k_values
         self.PS_values = PS_values
         self.Error_k_values = Error_k_values
@@ -45,6 +47,14 @@ class Likelihood21cmFast_multiz(object):
         self.PDFValsQSO = PDFValsQSO
         self.output_folder_location = output_folder_location
         self.walker_folder_location = walker_folder_location
+        self.USE_EXISTING_DATA = USE_EXISTING_DATA
+        self.USE_EXISTING_DATA_id1 = USE_EXISTING_DATA_id1
+        self.USE_EXISTING_DATA_id2 = USE_EXISTING_DATA_id2
+        
+        # Whether to copy or move files
+        self.move_prefix = "mv"
+        if COPY_DATA:
+            self.move_prefix = "cp"
 
     def Likelihood(self,ctx):
 
@@ -70,8 +80,12 @@ class Likelihood21cmFast_multiz(object):
         random_number = np.random.normal(size=1)
 
         # Create a second unique ID, that being the first variable of the specific walker (fail-safe against ID overlap; shouldn't happen, but guarding against anyway)
-        Individual_ID = Decimal(repr(random_number[0])).quantize(SIXPLACES)
-        Individual_ID_2 = Decimal(repr(params[0])).quantize(SIXPLACES)
+        if self.USE_EXISTING_DATA:
+            Individual_ID = Decimal(self.USE_EXISTING_DATA_id1).quantize(SIXPLACES)
+            Individual_ID_2 = Decimal(self.USE_EXISTING_DATA_id2).quantize(SIXPLACES)
+        else:
+            Individual_ID = Decimal(repr(random_number[0])).quantize(SIXPLACES)
+            Individual_ID_2 = Decimal(repr(params[0])).quantize(SIXPLACES)
 
         # Add all the redshifts (those for the likelihood and those for prior only). This parameter is only used where this is relevant
         number_redshifts = len(self.Redshift) + len(self.Redshifts_For_Prior)
@@ -172,122 +186,227 @@ class Likelihood21cmFast_multiz(object):
                 OutputGlobalAve = 0
 
         parameter_number = 0
-        create_file = open(f"{self.walker_folder_location}Walker_%s.txt"%(StringArgument_other),"w")
-        create_file.write("FLAGS    %s    %s    %s    %s    %s    %s    %s\n"%(GenerateNewICs,Subcell_RSDs,IONISATION_FCOLL_TABLE,UseFcollTable,PerformTsCalc,INHOMO_RECO,OutputGlobalAve))
-        
-        if self.param_legend['ALPHA'] is True:            
-            create_file.write("ALPHA    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
+        if self.USE_EXISTING_DATA:
+            walker_file = open(f"{self.walker_folder_location}Walker_{Individual_ID}_{Individual_ID_2}.txt","r")
+            Lines = walker_file.readlines()
+            self.parameter_number = 0
+
+            # FLAGS
+            match = re.match("^FLAGS\s+(\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d)\s+(\d)$", Lines[0].strip())
+            if match:
+                groups = match.groups()
+                GenerateNewICs = groups[0]
+                Subcell_RSDs = groups[1]
+                IONISATION_FCOLL_TABLE = groups[2]
+                UseFcollTable = groups[3]
+                PerformTsCalc = groups[4]
+                INHOMO_RECO = groups[5]
+                OutputGlobalAve = groups[6]
+            else:
+                raise Exception(f"Walker file: {walker_file} does not match expected pattern for FLAGS")
+
+            def read_float(string, saveKey, alwaysUseFiducial=False, useOtherParamKey=False, otherParamKey=None):
+                match = re.match(f"^{saveKey}\s+([0-9.]+)$", string.strip())
+                if match:
+                    groups = match.groups()
+                    if not alwaysUseFiducial:      
+                        if useOtherParamKey:
+                            paramKey = otherParamKey
+                        else:
+                            paramKey = saveKey     
+                        if self.param_legend[paramKey]:            
+                            try:            
+                                params[self.parameter_number] = groups[0]
+                            except:
+                                np.append(params, groups[0])
+                            self.parameter_number += 1
+                        else:
+                            self.Fiducial_Params[saveKey] = groups[0]   # Double because nested if cant be evaluated for some settings
+                    else:
+                        self.Fiducial_Params[saveKey] = groups[0]
+                else:
+                    raise Exception(f"Walker file: {walker_file} does not match expected pattern for {saveKey}")   
+
+            read_float(Lines[1], "ALPHA")
+            read_float(Lines[2], "ZETA")
+            read_float(Lines[3], "MFP")
+            read_float(Lines[4], "TVIR_MIN")
+            X_RAY_TVIR_MIN = params[self.parameter_number]
+            read_float(Lines[5], "L_X")
+            read_float(Lines[6], "NU_X_THRESH")
+            read_float(Lines[7], "NU_X_BAND_MAX", alwaysUseFiducial=True)
+            read_float(Lines[8], "NU_X_MAX", alwaysUseFiducial=True)
+            read_float(Lines[9], "X_RAY_SPEC_INDEX")
+            read_float(Lines[10], "X_RAY_TVIR_MIN", useOtherParamKey=True, otherParamKey="TVIR_MIN")
+            read_float(Lines[11], "X_RAY_TVIR_LB", alwaysUseFiducial=True)
+
+            read_float(Lines[12], "X_RAY_TVIR_UB", alwaysUseFiducial=True)
+            read_float(Lines[13], "F_STAR", alwaysUseFiducial=True)
+            read_float(Lines[14], "t_STAR", alwaysUseFiducial=True)
+            read_float(Lines[15], "N_RSD_STEPS", alwaysUseFiducial=True)
+            read_float(Lines[16], "LOS_direction", alwaysUseFiducial=True)
+
+            # Ts: I haven't added the CO_EVAL_Z here as I don't need it at the moment
+
+            parameter_number = self.parameter_number
+
         else:
-            create_file.write("ALPHA    %s\n"%(self.Fiducial_Params['ALPHA']))
+            create_file = open(f"{self.walker_folder_location}Walker_%s.txt"%(StringArgument_other),"w")
+            create_file.write("FLAGS    %s    %s    %s    %s    %s    %s    %s\n"%(GenerateNewICs,Subcell_RSDs,IONISATION_FCOLL_TABLE,UseFcollTable,PerformTsCalc,INHOMO_RECO,OutputGlobalAve))
+            
+            if self.param_legend['ALPHA'] is True:            
+                create_file.write("ALPHA    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("ALPHA    %s\n"%(self.Fiducial_Params['ALPHA']))
 
-        if self.param_legend['ZETA'] is True:
-            create_file.write("ZETA    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("ZETA    %s\n"%(self.Fiducial_Params['ZETA']))
+            if self.param_legend['ZETA'] is True:
+                create_file.write("ZETA    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("ZETA    %s\n"%(self.Fiducial_Params['ZETA']))
 
-        if self.param_legend['MFP'] is True:
-            create_file.write("MFP    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("MFP    %s\n"%(self.Fiducial_Params['MFP']))
+            if self.param_legend['MFP'] is True:
+                create_file.write("MFP    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("MFP    %s\n"%(self.Fiducial_Params['MFP']))
 
-        if self.param_legend['TVIR_MIN'] is True:
-            create_file.write("TVIR_MIN    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            X_RAY_TVIR_MIN = params[parameter_number]
-            parameter_number += 1
-        else:
-            create_file.write("TVIR_MIN    %s\n"%(self.Fiducial_Params['TVIR_MIN']))
+            if self.param_legend['TVIR_MIN'] is True:
+                create_file.write("TVIR_MIN    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                X_RAY_TVIR_MIN = params[parameter_number]
+                parameter_number += 1
+            else:
+                create_file.write("TVIR_MIN    %s\n"%(self.Fiducial_Params['TVIR_MIN']))
 
-        if self.param_legend['L_X'] is True:
-            create_file.write("L_X    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("L_X    %s\n"%(self.Fiducial_Params['L_X']))
+            if self.param_legend['L_X'] is True:
+                create_file.write("L_X    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("L_X    %s\n"%(self.Fiducial_Params['L_X']))
 
-        if self.param_legend['NU_X_THRESH'] is True:
-            create_file.write("NU_X_THRESH    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("NU_X_THRESH    %s\n"%(self.Fiducial_Params['NU_X_THRESH']))
+            if self.param_legend['NU_X_THRESH'] is True:
+                create_file.write("NU_X_THRESH    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("NU_X_THRESH    %s\n"%(self.Fiducial_Params['NU_X_THRESH']))
 
-        create_file.write("NU_X_BAND_MAX    %s\n"%(self.Fiducial_Params['NU_X_BAND_MAX']))
-        create_file.write("NU_X_MAX    %s\n"%(self.Fiducial_Params['NU_X_MAX']))
+            create_file.write("NU_X_BAND_MAX    %s\n"%(self.Fiducial_Params['NU_X_BAND_MAX']))
+            create_file.write("NU_X_MAX    %s\n"%(self.Fiducial_Params['NU_X_MAX']))
 
-        if self.param_legend['X_RAY_SPEC_INDEX'] is True:
-            create_file.write("X_RAY_SPEC_INDEX    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("X_RAY_SPEC_INDEX    %s\n"%(self.Fiducial_Params['X_RAY_SPEC_INDEX']))
+            if self.param_legend['X_RAY_SPEC_INDEX'] is True:
+                create_file.write("X_RAY_SPEC_INDEX    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("X_RAY_SPEC_INDEX    %s\n"%(self.Fiducial_Params['X_RAY_SPEC_INDEX']))
 
-        if self.param_legend['TVIR_MIN'] is True:
-            create_file.write("X_RAY_TVIR_MIN    %s\n"%(Decimal(repr(X_RAY_TVIR_MIN)).quantize(SIXPLACES)))
-        else:
-            create_file.write("X_RAY_TVIR_MIN    %s\n"%(self.Fiducial_Params['X_RAY_TVIR_MIN']))            
+            if self.param_legend['TVIR_MIN'] is True:
+                create_file.write("X_RAY_TVIR_MIN    %s\n"%(Decimal(repr(X_RAY_TVIR_MIN)).quantize(SIXPLACES)))
+            else:
+                create_file.write("X_RAY_TVIR_MIN    %s\n"%(self.Fiducial_Params['X_RAY_TVIR_MIN']))            
 
-        create_file.write("X_RAY_TVIR_LB    %s\n"%(self.Fiducial_Params['X_RAY_TVIR_LB']))
-        create_file.write("X_RAY_TVIR_UB    %s\n"%(self.Fiducial_Params['X_RAY_TVIR_UB']))
+            create_file.write("X_RAY_TVIR_LB    %s\n"%(self.Fiducial_Params['X_RAY_TVIR_LB']))
+            create_file.write("X_RAY_TVIR_UB    %s\n"%(self.Fiducial_Params['X_RAY_TVIR_UB']))
 
-        create_file.write("F_STAR    %s\n"%(self.Fiducial_Params['F_STAR']))
-        create_file.write("t_STAR    %s\n"%(self.Fiducial_Params['t_STAR']))
+            create_file.write("F_STAR    %s\n"%(self.Fiducial_Params['F_STAR']))
+            create_file.write("t_STAR    %s\n"%(self.Fiducial_Params['t_STAR']))
 
-        create_file.write("N_RSD_STEPS    %s\n"%(self.Fiducial_Params['N_RSD_SUBCELLS']))
-        create_file.write("LOS_direction    %s\n"%(self.Fiducial_Params['LOS_direction']))
+            create_file.write("N_RSD_STEPS    %s\n"%(self.Fiducial_Params['N_RSD_SUBCELLS']))
+            create_file.write("LOS_direction    %s\n"%(self.Fiducial_Params['LOS_direction']))
 
-        if self.IncludeLightCone is False: 
-            for i in range(number_redshifts):
-                create_file.write("CO-EVAL-Z    %s\n"%(AllRedshifts[i]))        
+            if self.IncludeLightCone is False: 
+                for i in range(number_redshifts):
+                    create_file.write("CO-EVAL-Z    %s\n"%(AllRedshifts[i]))        
 
-        create_file.close() 
+            create_file.close() 
 
         if self.FlagOptions['GENERATE_NEW_ICS'] is True:
             # A random number between 1 and 10^12 should be sufficient to randomise the ICs
             RandomSeed = np.random.uniform(low=1,high=1e12,size=1)
 
         # Now create the cosmology file associated with this walker.
-        create_file = open(f"{self.walker_folder_location}WalkerCosmology_%s.txt"%(StringArgument_other),"w")
-        if self.FlagOptions['GENERATE_NEW_ICS'] is True:
-            create_file.write("RANDOM_SEED    %s\n"%(RandomSeed[0]))
-        else:
-            create_file.write("RANDOM_SEED    %s\n"%(Decimal(repr(1.0)).quantize(SIXPLACES)))
+        if self.USE_EXISTING_DATA:
+            walker_file = open(f"{self.walker_folder_location}WalkerCosmology_{Individual_ID}_{Individual_ID_2}.txt","r")
+            Lines = walker_file.readlines()
+            self.parameter_number = 0
 
-        if self.param_legend['SIGMA_8'] is True:
-            create_file.write("SIGMA_8    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("SIGMA_8    %s\n"%(self.Fiducial_Params['SIGMA_8']))
+            def read_float(string, saveKey, alwaysUseFiducial=False, useOtherParamKey=False, otherParamKey=None):
+                match = re.match(f"^{saveKey}\s+([0-9.]+)$", string.strip())
+                if match:
+                    groups = match.groups()
+                    if not alwaysUseFiducial:      
+                        if useOtherParamKey:
+                            paramKey = otherParamKey
+                        else:
+                            paramKey = saveKey     
+                        if self.param_legend[paramKey]:
+                            try:            
+                                params[self.parameter_number] = groups[0]
+                            except:
+                                np.append(params, groups[0])
+                            self.parameter_number += 1
+                        else:
+                            self.Fiducial_Params[paramKey] = groups[0]   # Double because nested if cant be evaluated for some settings
+                    else:
+                        self.Fiducial_Params[saveKey] = groups[0]
+                else:
+                    raise Exception(f"WalkerCosmology file: {walker_file} does not match expected pattern for {saveKey}")
 
-        if self.param_legend['littleh'] is True:    
-            create_file.write("hubble    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("hubble    %s\n"%(self.Fiducial_Params['littleh']))
+            if self.FlagOptions["GENERATE_NEW_ICS"]:
+                match = re.match(f"^RANDOM_SEED\s+([0-9.]+)$", Lines[0].strip())
+                if match:
+                    groups = match.groups()
+                    RandomSeed[0] = groups[0]
 
-        if self.param_legend['OMEGA_M'] is True:
-            create_file.write("Omega_M    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("Omega_M    %s\n"%(self.Fiducial_Params['OMEGA_M']))
+            read_float(Lines[1], "SIGMA_8")
+            read_float(Lines[2], "hubble", useOtherParamKey=True, otherParamKey="littleh")
+            read_float(Lines[3], "Omega_M", useOtherParamKey=True, otherParamKey="OMEGA_M")
+            read_float(Lines[5], "Omega_b", useOtherParamKey=True, otherParamKey="OMEGA_b")
+            read_float(Lines[6], "ns", useOtherParamKey=True, otherParamKey="NS")
 
-        if self.param_legend['OMEGA_M'] is True:
-            create_file.write("Omega_L    %s\n"%(Decimal(repr(1. - params[parameter_number-1])).quantize(SIXPLACES)))
         else:
-            create_file.write("Omega_L    %s\n"%(Decimal(repr(1. - float(self.Fiducial_Params['OMEGA_M']))).quantize(SIXPLACES)))
+            create_file = open(f"{self.walker_folder_location}WalkerCosmology_%s.txt"%(StringArgument_other),"w")
+            if self.FlagOptions['GENERATE_NEW_ICS'] is True:
+                create_file.write("RANDOM_SEED    %s\n"%(RandomSeed[0]))
+            else:
+                create_file.write("RANDOM_SEED    %s\n"%(Decimal(repr(1.0)).quantize(SIXPLACES)))
 
-        if self.param_legend['OMEGA_b'] is True:
-            create_file.write("Omega_b    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("Omega_b    %s\n"%(self.Fiducial_Params['OMEGA_b']))
+            if self.param_legend['SIGMA_8'] is True:
+                create_file.write("SIGMA_8    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("SIGMA_8    %s\n"%(self.Fiducial_Params['SIGMA_8']))
 
-        if self.param_legend['NS'] is True:
-            create_file.write("ns    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
-            parameter_number += 1
-        else:
-            create_file.write("ns    %s\n"%(self.Fiducial_Params['NS']))
+            if self.param_legend['littleh'] is True:    
+                create_file.write("hubble    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("hubble    %s\n"%(self.Fiducial_Params['littleh']))
 
-        create_file.close()
+            if self.param_legend['OMEGA_M'] is True:
+                create_file.write("Omega_M    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("Omega_M    %s\n"%(self.Fiducial_Params['OMEGA_M']))
+
+            if self.param_legend['OMEGA_M'] is True:
+                create_file.write("Omega_L    %s\n"%(Decimal(repr(1. - params[parameter_number-1])).quantize(SIXPLACES)))
+            else:
+                create_file.write("Omega_L    %s\n"%(Decimal(repr(1. - float(self.Fiducial_Params['OMEGA_M']))).quantize(SIXPLACES)))
+
+            if self.param_legend['OMEGA_b'] is True:
+                create_file.write("Omega_b    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("Omega_b    %s\n"%(self.Fiducial_Params['OMEGA_b']))
+
+            if self.param_legend['NS'] is True:
+                create_file.write("ns    %s\n"%(Decimal(repr(params[parameter_number])).quantize(SIXPLACES)))
+                parameter_number += 1
+            else:
+                create_file.write("ns    %s\n"%(self.Fiducial_Params['NS']))
+
+            create_file.close()
 
         if self.FlagOptions['LOG_LINEAR_K_SAMPLING'] is True:
             kSplineMin = np.log10(self.Foreground_cut)
@@ -306,8 +425,9 @@ class Likelihood21cmFast_multiz(object):
 
         counter = 0
 
-        command = "./drive_21cmMC_streamlined %s"%(StringArgument)
-        os.system(command)
+        if not self.USE_EXISTING_DATA:
+            command = "./drive_21cmMC_streamlined %s"%(StringArgument)
+            os.system(command)
 
         total_sum = 0
         
@@ -344,27 +464,17 @@ class Likelihood21cmFast_multiz(object):
                 FrequencyBins = int(np.floor((FrequencyMax-FrequencyMin)/Bandwidth)) + 1
 
                 for j in range(FrequencyBins):
-
                     FrequencyVal = FrequencyMin + Bandwidth*j        
-
                     MockPS_val = interpolate.splev(FrequencyVal,splined_mock,der=0)
-
                     ModelPS_val = interpolate.splev(FrequencyVal,splined_model,der=0)
-                    
                     total_sum += np.square( (MockPS_val - ModelPS_val)/ErrorOnGlobal ) 
 
             else:
-
                 for j in range(len(self.Error_k_values[0])):
-
                     FrequencyVal = ((2.99792e8)/(.2112*(1. + self.Error_k_values[0][j])))/(1e6)
-
                     if FrequencyVal >= FrequencyMin and FrequencyVal <= FrequencyMax:
-
                         MockPS_val = interpolate.splev(FrequencyVal,splined_mock,der=0)
-
                         ModelPS_val = interpolate.splev(FrequencyVal,splined_model,der=0)
-                        
                         total_sum += np.square( (MockPS_val - ModelPS_val)/self.PS_Error[0][j] ) 
 
         else:
@@ -511,19 +621,27 @@ class Likelihood21cmFast_multiz(object):
                 seq_Planck.append("%s"%(XHI_ExtrapVals[i]))    
 
             # StringArgument_Planck = string.join(seq_Planck,separator_Planck)
-            StringArgument_Plan = f"{separator_Planck}".join(seq_Planck)
+            StringArgument_Planck = f"{separator_Planck}".join(seq_Planck)
 
             # Perform the computation of tau
-            command = './ComputingTau_e %s %s %s'%(Individual_ID,Decimal(repr(params[0])).quantize(SIXPLACES),StringArgument_Planck)
+            # TS: not sure if the second argument should be replaced by the 2nd individual ID if we want to use existing data, since it can be overwritten from the cosmology files
+            # I did change it now since for my current settings I ran into issues. If no preexisting data is used, the id should have the same value anyways
+            # Perhaps an issue that the relative path is incorrect compared to this likelihood file. This would fix it.
+            current_script_dir = os.path.dirname(os.path.abspath(__file__))
+            executable_path = os.path.abspath(os.path.join(current_script_dir, '..', '..', '..', 'ComputingTau_e'))
+            
+            command = '%s %s %s %s %s'%(executable_path, Individual_ID,Individual_ID_2,Decimal(repr(params[0])).quantize(SIXPLACES),StringArgument_Planck)
+            print(f"\nRunning {command}\n")
             os.system(command)
+            print(f"Command ran succesfully\n")
 
             # Read tau from file
-            tau_value = np.loadtxt('Tau_e_%s_%s.txt'%(Individual_ID,Decimal(repr(params[0])).quantize(SIXPLACES)), usecols=(0,))
+            tau_value = np.loadtxt('%sTau_e_%s_%s_%s.txt'%(self.output_folder_location,Individual_ID,Individual_ID_2,Decimal(repr(params[0])).quantize(SIXPLACES)), usecols=(0,))
             # remove the temporary files
             if self.FlagOptions['KEEP_ALL_DATA'] is True:
-                command = "mv Tau_e_%s_%s.txt %s/TauData/"%(Individual_ID,Decimal(repr(params[0])).quantize(SIXPLACES),self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+                command = "%s %sTau_e_%s_%s_%s.txt %s/TauData/"%(self.move_prefix, self.output_folder_location, Individual_ID,Individual_ID_2,Decimal(repr(params[0])).quantize(SIXPLACES),self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
             else:
-                command = "rm Tau_e_%s_%s.txt"%(Individual_ID,Decimal(repr(params[0])).quantize(SIXPLACES))
+                command = "rm %sTau_e_%s_%s_%s.txt"%(self.output_folder_location, Individual_ID,Individual_ID_2,Decimal(repr(params[0])).quantize(SIXPLACES))
             
             os.system(command)
 
@@ -659,7 +777,7 @@ class Likelihood21cmFast_multiz(object):
                 LightconePS = [line.rstrip('\n') for line in filename]
 
             if self.FlagOptions['KEEP_ALL_DATA'] is True:
-                command = "mv %s %s/StatisticalData/"%(LightconePSFilename,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])                
+                command = "%s %s %s/StatisticalData/"%(self.move_prefix,LightconePSFilename,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])                
             else:
                 command = "rm %s"%(LightconePSFilename)
             
@@ -668,7 +786,7 @@ class Likelihood21cmFast_multiz(object):
             # Removal of the individual light cone files is done here as in principle these can exceed the number of mock observations provided
             for i in range(len(LightconePS)):
                 if self.FlagOptions['KEEP_ALL_DATA'] is True:
-                    command = "mv %s %s/StatisticalData/"%(LightconePS[i],self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+                    command = "%s %s %s/StatisticalData/"%(self.move_prefix,LightconePS[i],self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
                 else:
                     command = "rm %s"%(LightconePS[i])
                 os.system(command)
@@ -682,7 +800,7 @@ class Likelihood21cmFast_multiz(object):
 
         if OutputGlobalAve == 1:
             if self.FlagOptions['KEEP_ALL_DATA'] is True:
-                command = f"mv {self.output_folder_location}AveData_%s.txt %s/AveData/"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+                command = f"{self.move_prefix} {self.output_folder_location}AveData_%s.txt %s/AveData/"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
             else:
                 command = f"rm {self.output_folder_location}AveData_%s.txt"%(StringArgument_other)
             
@@ -690,10 +808,10 @@ class Likelihood21cmFast_multiz(object):
 
 
         if self.FlagOptions['KEEP_ALL_DATA'] is True:
-            command = f"mv {self.walker_folder_location}Walker_%s.txt %s/WalkerData"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+            command = f"{self.move_prefix} {self.walker_folder_location}Walker_%s.txt %s/WalkerData"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
             os.system(command) 
 
-            command = f"mv {self.walker_folder_location}WalkerCosmology_%s.txt %s/WalkerData"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+            command = f"{self.move_prefix} {self.walker_folder_location}WalkerCosmology_%s.txt %s/WalkerData"%(StringArgument_other,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
             os.system(command) 
         else:
             command = f"rm {self.walker_folder_location}Walker_%s.txt"%(StringArgument_other)
