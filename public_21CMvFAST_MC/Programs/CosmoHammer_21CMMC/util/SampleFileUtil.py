@@ -35,10 +35,10 @@ class SampleFileUtil(object):
 		return values
 
 	def storeRandomState(self, filePath, randomState):
-		pickle.dump(randomState, file(filePath,'w'))
+		pickle.dump(randomState, open(filePath,'wb'))
 
 	def importRandomState(self, filePath):
-		state = pickle.load(file(filePath,'r'))
+		state = pickle.load(open(filePath,'rb'))
 		return state
 
 	def persistBurninValues(self, pos, prob, NF_values, data):

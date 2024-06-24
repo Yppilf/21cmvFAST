@@ -10,7 +10,6 @@ int main(int argc, char ** argv){
 
     char filename[500];
     char dummy_string[500];
-    char tau_idx[10];
     FILE *F;
     
     int i,N_REDSHIFTS;
@@ -19,7 +18,6 @@ int main(int argc, char ** argv){
     
     INDIVIDUAL_ID = atof(argv[1]);
     INDIVIDUAL_ID_2 = atof(argv[2]);
-    tau_idx = atof(argv[3]);
     
     double *PARAM_COSMOLOGY_VALS = calloc(TOTAL_COSMOLOGY_FILEPARAMS,sizeof(double));
     
@@ -64,8 +62,8 @@ int main(int argc, char ** argv){
 
 //    printf("Tau = %lf\n",taue);
     
-    sprintf(filename, "%s/Tau_e_%s_%s_%s.txt",OUTPUT_FOLDER,argv[1],argv[2],tau_idx);
-    fprintf(stderr, "Printing Tau data to %s\n",filename);
+    sprintf(filename, "%s/Tau_e_%s_%s_%s.txt",OUTPUT_FOLDER,argv[1],argv[2],argv[3]);
+    // fprintf(stderr, "Printing Tau data to %s\n",filename);
     F=fopen(filename, "wt");
     fprintf(F, "%lf\n",taue);
     fclose(F);

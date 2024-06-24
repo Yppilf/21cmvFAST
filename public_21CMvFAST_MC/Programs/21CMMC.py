@@ -886,16 +886,16 @@ if __name__ == '__main__':
                     params = params,
                     likelihoodComputationChain=chain,
                     filePrefix="%s"%(File_String),
-                    walkersRatio=16,
+                    walkersRatio=2, # 16
                     FiducialParams=Fiducial_Params,
                     param_legend=param_legend,
                     LowerBound_XRAY=X_RAY_TVIR_LB,
                     UpperBound_XRAY=X_RAY_TVIR_UB,
                     SpinTz=TsCalc_z,
-                    burninIterations=250,
-                    sampleIterations=3000,
+                    burninIterations=1, # 250
+                    sampleIterations=1, # 3000
                     filethin = 1,
-                    threadCount=24,
+                    threadCount=1, # 24
 	                reuseBurnin=False
 	           	)
 

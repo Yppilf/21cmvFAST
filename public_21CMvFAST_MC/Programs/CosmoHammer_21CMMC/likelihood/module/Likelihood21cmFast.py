@@ -11,6 +11,7 @@ import subprocess
 import time
 import multiprocessing
 import re
+import random
 
 TWOPLACES = Decimal(10) ** -2       # same as Decimal('0.01')
 FOURPLACES = Decimal(10) ** -4       # same as Decimal('0.0001')
@@ -630,18 +631,19 @@ class Likelihood21cmFast_multiz(object):
             current_script_dir = os.path.dirname(os.path.abspath(__file__))
             executable_path = os.path.abspath(os.path.join(current_script_dir, '..', '..', '..', 'ComputingTau_e'))
             
-            command = '%s %s %s %s %s'%(executable_path, Individual_ID,Individual_ID_2,Decimal(repr(params[0])).quantize(SIXPLACES),StringArgument_Planck)
-            print(f"\nRunning {command}\n")
+            # Generate random extra id to avoid overlap
+            randNum = random.random()*1e10
+            randId = f"{randNum:.0f}"
+            command = '%s %s %s %s %s'%(executable_path, Individual_ID,Individual_ID_2,randId,StringArgument_Planck)
             os.system(command)
-            print(f"Command ran succesfully\n")
 
             # Read tau from file
-            tau_value = np.loadtxt('%sTau_e_%s_%s_%s.txt'%(self.output_folder_location,Individual_ID,Individual_ID_2,Decimal(repr(params[0])).quantize(SIXPLACES)), usecols=(0,))
+            tau_value = np.loadtxt('%sTau_e_%s_%s_%s.txt'%(self.output_folder_location,Individual_ID,Individual_ID_2,randId), usecols=(0,))
             # remove the temporary files
             if self.FlagOptions['KEEP_ALL_DATA'] is True:
-                command = "%s %sTau_e_%s_%s_%s.txt %s/TauData/"%(self.move_prefix, self.output_folder_location, Individual_ID,Individual_ID_2,Decimal(repr(params[0])).quantize(SIXPLACES),self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
+                command = "%s %sTau_e_%s_%s_%s.txt %s/TauData/"%(self.move_prefix, self.output_folder_location, Individual_ID,Individual_ID_2,randId,self.FlagOptions['KEEP_ALL_DATA_FILENAME'])
             else:
-                command = "rm %sTau_e_%s_%s_%s.txt"%(self.output_folder_location, Individual_ID,Individual_ID_2,Decimal(repr(params[0])).quantize(SIXPLACES))
+                command = "rm %sTau_e_%s_%s_%s.txt"%(self.output_folder_location, Individual_ID,Individual_ID_2,randId)
             
             os.system(command)
 

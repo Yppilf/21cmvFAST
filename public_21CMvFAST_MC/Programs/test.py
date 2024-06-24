@@ -86,6 +86,8 @@
 # test = Test(walker_folder_location, True, param_legend)
 # test.read_walker()
 
-import os
+import random
 
-os.system("echo hi")
+a = random.random()*1e10
+b = f"{a:.0f}"
+print(b)
