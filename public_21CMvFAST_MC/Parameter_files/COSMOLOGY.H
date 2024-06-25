@@ -48,7 +48,7 @@
 
 
 
-#define OUTPUT_FOLDER "/scratch/s4950836/output_1"
+#define OUTPUT_FOLDER "/scratch/s4950836/output_2"
 //JBM:output folder name. If you want output in programs (as default) write "."
 
 // TS: Input folder name for boxes, incase files need to get moved.

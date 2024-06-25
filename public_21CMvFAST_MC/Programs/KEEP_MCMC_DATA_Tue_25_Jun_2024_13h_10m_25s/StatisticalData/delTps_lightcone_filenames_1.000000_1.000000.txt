@@ -1,0 +1,11 @@
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart006.00060_zend006.76017_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart006.76017_zend007.64969_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart007.64969_zend008.70075_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart008.70075_zend009.95509_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart009.95509_zend011.46889_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart011.46889_zend013.31907_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart013.31907_zend015.61336_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart015.61336_zend018.50623_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart018.50623_zend022.22568_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart022.22568_zend027.11951_300_300Mpc_lighttravel.txt
+/scratch/s4950836/output_2/delTps_estimate_1.000000_1.000000_zstart027.11951_zend033.73965_300_300Mpc_lighttravel.txt

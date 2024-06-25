@@ -4503,7 +4503,8 @@ void init_21cmMC_HII_arrays() {
 
 
     //JBM we want finer binning return to k_factor = 1.35; if want older results.
-    k_factor = 1.1;
+    // k_factor = 1.1;
+    k_factor = 1.05;
     k_first_bin_ceil = DELTA_K;
     k_max = DELTA_K*HII_DIM;
     // initialize arrays

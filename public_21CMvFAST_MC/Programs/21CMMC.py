@@ -21,7 +21,7 @@ from CosmoHammer_21CMMC.likelihood.module.Likelihood21cmFast import QSO_Redshift
 if __name__ == '__main__':
 	# Added the option to store the data in another folder than the relative path
 	# If the output is not moved, keep this as "./"
-	output_folder_location = "/scratch/s4950836/output_1/"
+	output_folder_location = "/scratch/s4950836/output_2/"
 	walker_folder_location = "/scratch/s4950836/Walker/"
 	print("\n----------------------------\nStarting 21CMMC.py\n----------------------------\n")
 

@@ -169,7 +169,7 @@ def subplot(frame, zs, ze, kList, PList, PobsList):
     frame.set_xlim(0.03, 1)
     return frame
 
-folderName = "KEEP_MCMC_DATA_Wed_19_Jun_2024_22h_55m_06s"
+folderName = "KEEP_MCMC_DATA_Tue_25_Jun_2024_13h_10m_25s"
 
 filenames = [name for name in os.listdir(f"{folderName}/StatisticalData") if re.match("delTps_estimate.*", name)]
 
@@ -201,5 +201,5 @@ fig.supxlabel("$k [Mpc^{-1}]$")
 fig.supylabel("$\Delta^2(k) [mK^2]$")
 fig.suptitle("21cm power spectra for different redshifts")
 fig.tight_layout()
-fig.savefig("21cm_mosaic.png")
+fig.savefig("21cm_mosaic2.png")
 
