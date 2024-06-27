@@ -21,7 +21,7 @@ from CosmoHammer_21CMMC.likelihood.module.Likelihood21cmFast import QSO_Redshift
 if __name__ == '__main__':
 	# Added the option to store the data in another folder than the relative path
 	# If the output is not moved, keep this as "./"
-	output_folder_location = "/scratch/s4950836/output_2/"
+	output_folder_location = "/scratch/s4950836/output_3/"
 	walker_folder_location = "/scratch/s4950836/Walker/"
 	print("\n----------------------------\nStarting 21CMMC.py\n----------------------------\n")
 
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 	# False will retain the original functionality. The id's specified below won't be used
 	# NOTE if IncludeLightCone is False, the CO_EVAL_Z will still not be read. So do not use this functionality if that is the case, it won't work
 	# NOTE make sure the settings correspond to the data, there are no checks in place
-	USE_EXISTING_DATA = True
+	USE_EXISTING_DATA = False
 	USE_EXISTING_DATA_id1 = 1.0
 	USE_EXISTING_DATA_id2 = 1.0
 

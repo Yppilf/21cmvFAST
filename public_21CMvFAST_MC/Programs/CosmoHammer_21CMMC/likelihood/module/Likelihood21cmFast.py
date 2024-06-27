@@ -427,8 +427,17 @@ class Likelihood21cmFast_multiz(object):
         counter = 0
 
         if not self.USE_EXISTING_DATA:
+            # TS: Make sure to wait for the script to finish before aborting. Note code can have an error, but that should be ignored
+            # Not sure if this is helping as the code still does not work for me
             command = "./drive_21cmMC_streamlined %s"%(StringArgument)
-            os.system(command)
+            try:
+                # process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+                # process.wait()
+                return_code = subprocess.call(command)
+            except:
+                print(f"Error in drive_21cmMC_streamlined with arguments {StringArgument}")
+            # print process.returncode
+            # os.system(command)
 
         total_sum = 0
         

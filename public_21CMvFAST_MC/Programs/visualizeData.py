@@ -164,7 +164,7 @@ def plot_position(i, rows, cols):
 def subplot(frame, zs, ze, kList, PList, PobsList):
     frame.set_title(f"z = {float(zs):.2f} - {float(ze):.2f}")
     frame.plot(kList,PList, label="simulated data")
-    frame.plot(kList, PobsList, label="AP shifted spectrum")
+    # frame.plot(kList, PobsList, label="AP shifted spectrum")
     frame.set_xscale("log")
     frame.set_xlim(0.03, 1)
     return frame
